@@ -26,3 +26,26 @@ function addRandomColor() {
   const page = document.getElementsByTagName('BODY')[0];
   page.style.backgroundColor = color;
 }
+
+document.addEventListener("DOMContentLoaded", ready);
+function ready() {
+    let photos = document.getElementsByClassName("pic");
+    for (let i=0; i<photos.length; i++) {
+        photos[i].addEventListener("mouseenter", function() {
+            let children = photos[i].children;
+            let pic = children[0];
+            let caption = children[1];
+            pic.className = pic.className.replace("", "hidden");
+            caption.className = caption.className.replace("hidden", "");
+        });
+    }
+    for (let i=0; i<photos.length; i++) {
+        photos[i].addEventListener("mouseleave", function() {
+            let children = photos[i].children;
+            let pic = children[0];
+            let caption = children[1];
+            pic.className = pic.className.replace("hidden", "");
+            caption.className = caption.className.replace("", "hidden");
+        });
+    }
+}
