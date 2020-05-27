@@ -4,6 +4,23 @@
   width: 650px;
 }
 
+#content h1 {
+  text-align: center;
+}
+
+.navbar {
+    text-align: center;
+    margin: 0 auto;
+}
+
+.nav {
+  display: inline-block;
+  padding: 10px;
+  margin: 0;
+  border-top: thin solid black;
+  border-bottom: thin solid black;
+}
+
 #greeting-container {
   margin-top: 20px;
 }
