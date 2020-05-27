@@ -4,6 +4,12 @@
   width: 650px;
 }
 
+#photos {
+  margin-left: auto;
+  margin-right: auto;
+  width: 1000px;
+}
+
 #content h1 {
   text-align: center;
 }
@@ -11,14 +17,34 @@
 .navbar {
     text-align: center;
     margin: 0 auto;
+    padding-bottom: 15px;
+}
+
+body {
+    background-color: #F9F7F2;
+}
+
+.active {
+    background-color: deeppink;
+}
+
+.post {
+    border-top: thin solid black;
+    padding-bottom: 25px;
 }
 
 .nav {
   display: inline-block;
   padding: 10px;
-  margin: 0;
+  margin: -2px;
+  text-decoration: none;
   border-top: thin solid black;
   border-bottom: thin solid black;
+  color: black;
+}
+
+.nav:hover {
+    background-color: deeppink;
 }
 
 #greeting-container {
@@ -43,4 +69,40 @@
 
 #random-image-container img {
   margin-top: 20px;
+}
+
+h1 {
+    font-family: "courier";
+}
+
+h3 {
+    font-family: "courier";
+}
+
+h4 {
+    font-family: "courier";
+}
+
+h5 {
+    font-family: "courier";
+}
+
+p {
+    font-family: "courier";
+}
+
+a {
+    font-family: "courier";
+}
+
+li {
+    font-family: "courier";
+}
+
+ol {
+    font-family: "courier";
+}
+
+ul {
+    font-family: "courier";
 }
