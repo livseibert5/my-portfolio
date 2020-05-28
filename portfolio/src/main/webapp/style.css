@@ -14,7 +14,7 @@
   text-align: center;
 }
 
-.navbar {
+nav {
     text-align: center;
     margin: 0 auto;
     padding-bottom: 15px;
@@ -41,7 +41,7 @@ body {
     background-color: deeppink;
 }
 
-.post {
+article {
     border-top: thin solid black;
     padding-bottom: 25px;
 }
