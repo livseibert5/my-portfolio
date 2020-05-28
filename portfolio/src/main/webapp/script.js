@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * Adds a random greeting to the page.
+ * Changes background color of page randomly.
  */
 function addRandomColor() {
   const colors =
@@ -29,23 +29,31 @@ function addRandomColor() {
 
 document.addEventListener("DOMContentLoaded", ready);
 function ready() {
+
+    function toggleHidden(photo) {
+        let children = photo.children;
+        let pic = children[0];
+        let caption = children[1];
+        if (pic.classList.contains("hidden")) {
+            flip(caption, pic);
+        } else {
+            flip(pic, caption);
+        }
+    }
+
+    function flip(hide, show) {
+        hide.className = hide.className.replace("", "hidden");
+        show.className = show.className.replace("hidden", "");
+    }
+
     let photos = document.getElementsByClassName("pic");
     for (let i=0; i<photos.length; i++) {
         photos[i].addEventListener("mouseenter", function() {
-            let children = photos[i].children;
-            let pic = children[0];
-            let caption = children[1];
-            pic.className = pic.className.replace("", "hidden");
-            caption.className = caption.className.replace("hidden", "");
+            toggleHidden(photos[i]);
         });
-    }
-    for (let i=0; i<photos.length; i++) {
         photos[i].addEventListener("mouseleave", function() {
-            let children = photos[i].children;
-            let pic = children[0];
-            let caption = children[1];
-            pic.className = pic.className.replace("hidden", "");
-            caption.className = caption.className.replace("", "hidden");
+            toggleHidden(photos[i]);
         });
     }
+
 }
