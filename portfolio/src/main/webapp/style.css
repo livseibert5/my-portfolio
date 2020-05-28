@@ -15,49 +15,49 @@
 }
 
 nav {
-    text-align: center;
-    margin: 0 auto;
-    padding-bottom: 15px;
+  margin: 0 auto;
+  padding-bottom: 15px;
+  text-align: center;
 }
 
 .hidden {
-    display: none;
+  display: none;
 }
 
 .caption {
-    height: 220px;
-    width: 220px;
-    text-align: center;
-    background-color: #F0F0F0;
-    opacity: .5;
-    padding-top: 50px;
+  background-color: #F0F0F0;
+  height: 220px;
+  opacity: .5;
+  padding-top: 50px;
+  text-align: center;
+  width: 220px;
 }
 
 body {
-    background-color: #F9F7F2;
+  background-color: #F9F7F2;
 }
 
 .active {
-    background-color: deeppink;
+  background-color: deeppink;
 }
 
 article {
-    border-top: thin solid black;
-    padding-bottom: 25px;
+  border-top: thin solid black;
+  padding-bottom: 25px;
 }
 
 .nav {
-  display: inline-block;
-  padding: 10px;
-  margin: -2px;
-  text-decoration: none;
   border-top: thin solid black;
   border-bottom: thin solid black;
   color: black;
+  display: inline-block;
+  margin: -2px;
+  padding: 10px;
+  text-decoration: none;
 }
 
 .nav:hover {
-    background-color: deeppink;
+  background-color: deeppink;
 }
 
 #greeting-container {
@@ -84,38 +84,35 @@ article {
   margin-top: 20px;
 }
 
-h1 {
-    font-family: "courier";
+.hover-label[aria-label]:hover {
+  display: block;
+  position: relative;
 }
 
-h3 {
-    font-family: "courier";
+.hover-label[aria-label]:hover::before {
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.5);
+  box-sizing: border-box;
+  color: #eee;
+  content: attr(aria-label);
+  display: flex;
+  height: 100%;
+  justify-content: center;
+  left: 0;
+  padding: 1rem;
+  position: absolute;
+  text-align: center;
+  text-decoration: none;
+  top: 0;
+  width: 100%;
 }
 
-h4 {
-    font-family: "courier";
-}
-
-h5 {
-    font-family: "courier";
-}
-
-p {
-    font-family: "courier";
-}
-
-a {
-    font-family: "courier";
-}
-
+h1,
+h3,
+h4,
+h5,
+p,
+a,
 li {
-    font-family: "courier";
-}
-
-ol {
-    font-family: "courier";
-}
-
-ul {
-    font-family: "courier";
+  font-family: courier;
 }

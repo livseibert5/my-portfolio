@@ -19,41 +19,10 @@ function addRandomColor() {
   const colors =
       ['lavender', 'aliceblue', 'lavenderblush', 'peachpuff', 'cornsilk', 'seashell', 'whitesmoke', 'honeydew'];
 
-  // Pick a random greeting.
+  // Pick a random color.
   const color = colors[Math.floor(Math.random() * colors.length)];
 
   // Add it to the page.
   const page = document.getElementsByTagName('BODY')[0];
   page.style.backgroundColor = color;
-}
-
-document.addEventListener("DOMContentLoaded", ready);
-function ready() {
-
-    function toggleHidden(photo) {
-        let children = photo.children;
-        let pic = children[0];
-        let caption = children[1];
-        if (pic.classList.contains("hidden")) {
-            flip(caption, pic);
-        } else {
-            flip(pic, caption);
-        }
-    }
-
-    function flip(hide, show) {
-        hide.className = hide.className.replace("", "hidden");
-        show.className = show.className.replace("hidden", "");
-    }
-
-    let photos = document.getElementsByClassName("pic");
-    for (let i=0; i<photos.length; i++) {
-        photos[i].addEventListener("mouseenter", function() {
-            toggleHidden(photos[i]);
-        });
-        photos[i].addEventListener("mouseleave", function() {
-            toggleHidden(photos[i]);
-        });
-    }
-
 }
