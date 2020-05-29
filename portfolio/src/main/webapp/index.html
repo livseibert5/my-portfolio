@@ -1,59 +1,52 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="UTF-8">
-    <title>My Portfolio</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="script.js"></script>
-  </head>
-  <body>
-    <div id="content">
-      <h1>Livia's Portfolio</h1>
-      <div class="navbar">
-        <a href="/index.html" class="nav">Home</a>
-        <a href="/images.html" class="nav">Photos</a>
-        <a href="/blog.html" class="nav">Blog</a>
-      </div>
-      <h3>About Me</h3>
-      <p>My name is Livia Seibert and I am a third-year student at Duke University. 
-          I am working towards a double major in Electrical and Computer Engineering and Computer Science
-          with concentrations in Digital Systems and Signal Processing. When I am not studying, I am active
-          in Duke's social and pre-professional tech interest organization named Catalyst where I served
-          as rush chair this semester. I am also involved in Greek life and am a member of Alpha Phi.</p>
-      <p>Outside of my school life, I live in the suburbs of Philadelphia with my parents, 3 siblings, 
-          and 2 dogs. I'm the oldest of four girls with a 13 year age gap between me and the youngest.
-          Having such a big family is often chaotic but a lot of fun.</p>
+<meta charset="utf-8">
+<title>My Portfolio</title>
+<link rel="stylesheet" href="style.css">
+<script src="script.js"></script>
+<div id="content">
+  <h1>Livia's Portfolio</h1>
+  <nav class="navbar">
+    <a href="/index.html" class="nav active">Home</a>
+    <a href="/images.html" class="nav">Photos</a>
+    <a href="/blog.html" class="nav">Blog</a>
+  </nav>
+  <h3>About Me</h3>
+  <p>My name is Livia Seibert and I am a third-year student at Duke University. 
+      I am working towards a double major in Electrical and Computer Engineering and Computer Science
+      with concentrations in Digital Systems and Signal Processing. When I am not studying, I am active
+      in Duke's social and pre-professional tech interest organization named Catalyst where I served
+      as rush chair this semester. I am also involved in Greek life and am a member of Alpha Phi.</p>
+  <p>Outside of my school life, I live in the suburbs of Philadelphia with my parents, 3 siblings, 
+      and 2 dogs. I'm the oldest of four girls with a 13 year age gap between me and the youngest.
+      Having such a big family is often chaotic but a lot of fun.</p>
 
-      <h3>My Projects</h3>
-      <ul>
-        <li>Integrated Design Challenge - worked in a team of 3 engineers to build a robot that would play
-            a modified game of quidditch with other robots. An Arduino controlled a system of sensors that
-            included QTIs for path following, an XBee module for wireless communication, an LCD display for
-            point monitoring, and a Hall Effect sensor to detect the magnetic snitch.</li>
-        <li>Falls Prevention Device - worked with a client and a team of 4 engineering students to develop
-            a device to prevent falls amongst senior citizens living in nursing homes. Programmed an Arduino
-            to control a system of sensors to detect movement and alert nurses through the call system at a
-            fraction of the price of existing solutions.</li>
-        <li>Storage App - Hackathon-type progject that used the React JavaScript library and Google Maps API
-            to build a user interface for an app that would connect college students to nearby storage spaces</li>
-        <li>Children's Hospital of Philadelphia - Used the Python framework Flask to develop a web app for a
-            team of data-driven genomics researchers to condense user information from a DNA database into a
-            more readable and searchable layout.</li>
-        <li>School Magazine - made a web app using Web2Py to make my high school's student magazine virtual.
-            Included different interfaces for writers, editors, and viewers so that writers could send their
-            work to their editor for review through the app, making it displayable to readers only once
-            approved by the editor.</li>
-      </ul>
+  <h3>My Projects</h3>
+  <ul>
+    <li>Integrated Design Challenge - worked in a team of 3 engineers to build a robot that would play
+        a modified game of quidditch with other robots. An Arduino controlled a system of sensors that
+        included QTIs for path following, an XBee module for wireless communication, an LCD display for
+        point monitoring, and a Hall Effect sensor to detect the magnetic snitch.
+    <li>Falls Prevention Device - worked with a client and a team of 4 engineering students to develop
+        a device to prevent falls amongst senior citizens living in nursing homes. Programmed an Arduino
+        to control a system of sensors to detect movement and alert nurses through the call system at a
+        fraction of the price of existing solutions.
+    <li>Storage App - Hackathon-type progject that used the React JavaScript library and Google Maps API
+        to build a user interface for an app that would connect college students to nearby storage spaces
+    <li>Children's Hospital of Philadelphia - Used the Python framework Flask to develop a web app for a
+        team of data-driven genomics researchers to condense user information from a DNA database into a
+        more readable and searchable layout.
+    <li>School Magazine - made a web app using Web2Py to make my high school's student magazine virtual.
+        Included different interfaces for writers, editors, and viewers so that writers could send their
+        work to their editor for review through the app, making it displayable to readers only once
+        approved by the editor.
+  </ul>
 
-      <h3>My Links</h3>
-      <ul>
-        <li><a href="https://www.linkedin.com/in/livia-s-200b00124/">LinkedIn Profile</a></li>
-        <li><a href="https://github.com/livseibert5">GitHub</a></li>
-      </ul>
+  <h3>My Links</h3>
+  <ul>
+    <li><a href="https://www.linkedin.com/in/livia-s-200b00124/">LinkedIn Profile</a>
+    <li><a href="https://github.com/livseibert5">GitHub</a>
+  </ul>
 
-      <p>Click here to get a random message:</p>
-      <button onclick="addRandomGreeting()">Hello</button>
-      <div id="greeting-container"></div>
-    </div>
-  </body>
-</html>
+  <p>Click here to change the background color randomly:</p>
+  <button onclick="addRandomColor()">Change Color!</button>
+</div>

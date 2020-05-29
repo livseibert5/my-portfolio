@@ -13,16 +13,15 @@
 // limitations under the License.
 
 /**
- * Adds a random greeting to the page.
+ * Changes background color of page randomly.
  */
-function addRandomGreeting() {
-  const greetings =
-      ['Hello world!', '¡Hola Mundo!', '你好，世界！', 'Bonjour le monde!'];
+function addRandomColor() {
+  const colors =
+      ['lavender', 'aliceblue', 'lavenderblush', 'peachpuff', 'cornsilk', 'seashell', 'whitesmoke', 'honeydew'];
 
-  // Pick a random greeting.
-  const greeting = greetings[Math.floor(Math.random() * greetings.length)];
+  // Pick a random color.
+  const color = colors[Math.floor(Math.random() * colors.length)];
 
   // Add it to the page.
-  const greetingContainer = document.getElementById('greeting-container');
-  greetingContainer.innerText = greeting;
+  document.body.style.backgroundColor = color;
 }
