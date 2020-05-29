@@ -23,6 +23,5 @@ function addRandomColor() {
   const color = colors[Math.floor(Math.random() * colors.length)];
 
   // Add it to the page.
-  const page = document.getElementsByTagName('BODY')[0];
-  page.style.backgroundColor = color;
+  document.body.style.backgroundColor = color;
 }
