@@ -40,3 +40,21 @@ function addMessageToDom(message) {
   const messageContainer = document.getElementById('content-container');
   messageContainer.innerText = message;
 }
+
+function getComments() {
+  fetch('/data').then(response => response.json()).then((comments) => {
+    const commentsListElement = document.getElementById('comments-section');
+    commentsListElement.innerHTML = '';
+    for (let i=0; i<comments.length; i++) {
+      console.log('Adding comment.');
+      commentsListElement.appendChild(createListElement('Comment: ' + comments[i]));
+    }
+  });
+}
+
+function createListElement(text) {
+  console.log('Creating comment.');
+  const liElement = document.createElement('li');
+  liElement.innerText = text;
+  return liElement;
+}

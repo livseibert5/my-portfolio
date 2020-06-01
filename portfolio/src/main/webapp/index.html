@@ -3,6 +3,7 @@
 <title>My Portfolio</title>
 <link rel="stylesheet" href="style.css">
 <script src="script.js"></script>
+<body onload="getComments()">
 <div id="content">
   <h1>Livia's Portfolio</h1>
   <nav class="navbar">
@@ -47,9 +48,13 @@
     <li><a href="https://github.com/livseibert5">GitHub</a>
   </ul>
 
+  <h3>Comments</h3>
+  <ul id="comments-section"></ul>
+
   <p>Click here to change the background color randomly:</p>
   <button onclick="addRandomColor()">Change Color!</button>
 
   <button onclick="getContent()">Fetch a message!</button>
   <div id="content-container"></div>
 </div>
+</body>
