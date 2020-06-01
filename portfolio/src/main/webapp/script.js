@@ -27,24 +27,16 @@ function addRandomColor() {
 }
 
 function getContent() {
-  console.log('Fetching content from server.');
-
   const responsePromise = fetch('/data');
-
   responsePromise.then(handleResponse);
 }
 
 function handleResponse(response) {
-  console.log('Handling the response.');
-
   const textPromise = response.text();
-
   textPromise.then(addMessageToDom);
 }
 
 function addMessageToDom(message) {
-  console.log('Adding message to dom: ' + message);
-
   const messageContainer = document.getElementById('content-container');
   messageContainer.innerText = message;
 }
