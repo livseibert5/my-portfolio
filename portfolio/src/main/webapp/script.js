@@ -25,3 +25,18 @@ function addRandomColor() {
   // Add it to the page.
   document.body.style.backgroundColor = color;
 }
+
+function getContent() {
+  const responsePromise = fetch('/data');
+  responsePromise.then(handleResponse);
+}
+
+function handleResponse(response) {
+  const textPromise = response.text();
+  textPromise.then(addMessageToDom);
+}
+
+function addMessageToDom(message) {
+  const messageContainer = document.getElementById('content-container');
+  messageContainer.innerText = message;
+}
