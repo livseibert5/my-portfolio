@@ -44,17 +44,19 @@ function addMessageToDom(message) {
 document.addEventListener('DOMContentLoaded', getComments);
 
 function getComments() {
-  fetch('/data').then((response) => response.json()).then((comments) => {
-      const commentsListElement = document.getElementById('comments-section');
-      if (comments.length == 0) {
-        commentsListElement.innerHTML = 'Nothing to show.';
-      } else {
-        commentsListElement.innerHTML = '';
-        comments.map(createCommentElement).forEach(element => commentsListElement.appendChild(element));
-      }
-      }).catch(() => {
-        console.log("error");
-  });
+  fetch('/data').then((response) => response.json())
+                .then((comments) => {
+                  const commentsListElement = document.getElementById('comments-section');
+                  if (comments.length == 0) {
+                    commentsListElement.innerHTML = 'Nothing to show.';
+                  } else {
+                    commentsListElement.innerHTML = '';
+                    comments.map(createCommentElement).forEach(element => commentsListElement.appendChild(element));
+                  }
+                })
+                .catch(() => {
+                  console.log("error");
+                });
 }
 
 /**
