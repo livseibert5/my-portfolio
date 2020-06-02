@@ -47,13 +47,21 @@ function getComments() {
   fetch('/data').then(response => response.json()).then((comments) => {
     const commentsListElement = document.getElementById('comments-section');
     commentsListElement.innerHTML = '';
-    for (let i=0; i<comments.length; i++) {
-      commentsListElement.appendChild(createListElement('Comment: ' + comments[i]));
-    }
+    comments.map(createCommentElement).forEach(element => commentsListElement.appendChild(element));
+  });
+
+  fetch('/data').then(response => response.json()).catch((error) => {
+    console.log("error");
   });
 }
 
-function createListElement(text) {
+/**
+ * Takes text of a comment and puts it in a
+ * list element to be displayed.
+ * @param {text} content of user comment
+ * @return {liElement} list element to hold comment
+ */
+function createCommentElement(text) {
   const liElement = document.createElement('li');
   liElement.innerText = text;
   return liElement;
