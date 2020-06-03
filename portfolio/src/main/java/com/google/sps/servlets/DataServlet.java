@@ -36,6 +36,9 @@ public class DataServlet extends HttpServlet {
 
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    String commentLimitString = request.getParameter("comment-limit");
+    int commentLimit = Integer.parseInt(commentLimitString);
+
     Query query = new Query("Comment").addSort("timestamp", SortDirection.DESCENDING);
     List<Comment> comments = new ArrayList<Comment>();
 
@@ -48,6 +51,8 @@ public class DataServlet extends HttpServlet {
       Comment myComment = new Comment(name, text);
       comments.add(myComment);
     }
+
+    comments = comments.subList(0,commentLimit);
 
     Gson gson = new Gson();
     String json = gson.toJson(comments);

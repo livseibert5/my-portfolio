@@ -41,25 +41,24 @@ function addMessageToDom(message) {
   messageContainer.innerText = message;
 }
 
-document.addEventListener('DOMContentLoaded', getComments);
+document.addEventListener('DOMContentLoaded', getComments(3));
 
-function getComments() {
-  fetch('/data').then((response) => response.json()).then((comments) => {
+function getComments(value) {
+  let url = '/data?comment-limit=' + value.toString();
+  fetch(url).then((response) => response.json()).then((comments) => {
     const commentsListElement = document.getElementById('comments-section');
     if (comments.length == 0) {
       commentsListElement.innerHTML = 'Nothing to show.';
     } else {
       commentsListElement.innerHTML = '';
       comments.forEach((comment) => {
-        let name = comment.name;
-        let text = comment.text;
-        let element = createCommentElement(name, text);
+        const name = comment.name;
+        const text = comment.text;
+        const element = createCommentElement(name, text);
         commentsListElement.appendChild(element);
       })
-    }
-  })
-    .catch(() => {
-       console.log("error");
+    }}).catch(() => {
+      console.log("error");
   });
 }
 
@@ -71,19 +70,11 @@ function getComments() {
  * @return {commentElement} list element to hold comment
  */
 function createCommentElement(name, text) {
-  const commentElement = document.createElement('li');
+  const commentTemplate = document.getElementById('comment-template');
+  const commentElement = commentTemplate.content.cloneNode(true);
 
-  const nameElement = document.createElement('span');
-  const textElement = document.createElement('span');
-
-  nameElement.innerText = "Name: " + name;
-  textElement.innerText = "Comment: " + text;
-
-  nameElement.className = "info";
-  textElement.className = "info";
-
-  commentElement.appendChild(nameElement);
-  commentElement.appendChild(textElement);
+  commentElement.querySelector(".name").innerText = name;
+  commentElement.querySelector(".text").innerText = text;
 
   return commentElement;
 }
