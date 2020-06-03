@@ -44,29 +44,46 @@ function addMessageToDom(message) {
 document.addEventListener('DOMContentLoaded', getComments);
 
 function getComments() {
-  fetch('/data').then((response) => response.json())
-                .then((comments) => {
-                  const commentsListElement = document.getElementById('comments-section');
-                  if (comments.length == 0) {
-                    commentsListElement.innerHTML = 'Nothing to show.';
-                  } else {
-                    commentsListElement.innerHTML = '';
-                    comments.map(createCommentElement).forEach(element => commentsListElement.appendChild(element));
-                  }
-                })
-                .catch(() => {
-                  console.log("error");
-                });
+  fetch('/data').then((response) => response.json()).then((comments) => {
+    const commentsListElement = document.getElementById('comments-section');
+    if (comments.length == 0) {
+      commentsListElement.innerHTML = 'Nothing to show.';
+    } else {
+      commentsListElement.innerHTML = '';
+      comments.forEach((comment) => {
+        let name = comment.name;
+        let text = comment.text;
+        let element = createCommentElement(name, text);
+        commentsListElement.appendChild(element);
+      })
+    }
+  })
+    .catch(() => {
+       console.log("error");
+  });
 }
 
 /**
- * Takes text of a comment and puts it in a
- * list element to be displayed.
- * @param {text} content of user comment
- * @return {liElement} list element to hold comment
+ * Takes text and name of a comment and puts
+ * it in a list element to be displayed.
+ * @param {name} name of user commenting
+ * @param {text} text of comment
+ * @return {commentElement} list element to hold comment
  */
-function createCommentElement(text) {
-  const liElement = document.createElement('li');
-  liElement.innerText = text;
-  return liElement;
+function createCommentElement(name, text) {
+  const commentElement = document.createElement('li');
+
+  const nameElement = document.createElement('span');
+  const textElement = document.createElement('span');
+
+  nameElement.innerText = "Name: " + name;
+  textElement.innerText = "Comment: " + text;
+
+  nameElement.className = "info";
+  textElement.className = "info";
+
+  commentElement.appendChild(nameElement);
+  commentElement.appendChild(textElement);
+
+  return commentElement;
 }
