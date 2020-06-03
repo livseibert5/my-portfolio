@@ -58,7 +58,7 @@ function getComments(value) {
         commentsListElement.appendChild(element);
       })
     }}).catch(() => {
-      console.log("error");
+      console.error("JSON from servlet is bad or is being handled wrong on fetch.");
   });
 }
 
