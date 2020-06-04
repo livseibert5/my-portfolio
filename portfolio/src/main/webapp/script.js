@@ -26,9 +26,19 @@ function addRandomColor() {
   document.body.style.backgroundColor = color;
 }
 
-document.addEventListener('DOMContentLoaded', getComments(3));
+document.addEventListener('DOMContentLoaded', () => {
+  try {
+    let lim = parseInt(localStorage.getItem("commentLim"));
+    getComments(lim);
+  } catch(err) {
+    console.log(err);
+    getComments(3);
+  }
+});
 
 function getComments(value) {
+  localStorage.clear();
+  localStorage.setItem("commentLim", value.toString());
   let url = '/data?comment-limit=' + value.toString();
   fetch(url).then((response) => response.json()).then((comments) => {
     const commentsListElement = document.getElementById('comments-section');
@@ -48,8 +58,10 @@ function getComments(value) {
 }
 
 function deleteComments() {
-  const request = new Request('/delete-data', {method:'POST'});
-  fetch(request).then(() => getComments(0));
+  if (window.confirm("Are you sure you want to delete all comments?")) {
+    const request = new Request('/data', {method:'delete'});
+    fetch(request).then(() => getComments(0));
+  }
 }
 
 /**

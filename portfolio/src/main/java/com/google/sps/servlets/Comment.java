@@ -14,32 +14,23 @@
 
 package com.google.sps.servlets;
 
-import com.google.appengine.api.datastore.DatastoreService;
-import com.google.appengine.api.datastore.DatastoreServiceFactory;
-import com.google.appengine.api.datastore.Entity;
 import com.google.gson.Gson;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+//represents a comment with the user's name, text,and timestamp
 public class Comment {
 
-  private String name = "";
-  private long timestamp = 0;
-  private String text = "";
-
-  public Comment() {
-    this.timestamp = System.currentTimeMillis();
-  }
+  private final String name;
+  private final long timestamp;
+  private final String text;
 
   public Comment(String name, String text) {
     this.timestamp = System.currentTimeMillis();
     this.name = name;
     this.text = text;
   }
-
 }

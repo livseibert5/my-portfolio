@@ -17,6 +17,7 @@ package com.google.sps.servlets;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.FetchOptions;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
@@ -31,23 +32,44 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-@WebServlet("/delete-data")
-public class DeleteDataServlet extends HttpServlet {
+//handles all the datastore actions
+public class DataService {
 
-  @Override
-  public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+  public void makeEntity(String name, long timestamp, String text) {
+    Entity taskEntity = new Entity("Comment");
+    taskEntity.setProperty("name", name);
+    taskEntity.setProperty("timestamp", timestamp);
+    taskEntity.setProperty("text", text);
+
+    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+    datastore.put(taskEntity);
+  }
+
+  public List<Comment> getComments(int commentLimit) {
+    Query query = new Query("Comment").addSort("timestamp", SortDirection.DESCENDING);
+    List<Comment> comments = new ArrayList<Comment>();
+
+    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+
+    List<Entity> results = datastore.prepare(query).asList(FetchOptions.Builder.withLimit(commentLimit));
+    for (Entity entity: results) {
+      String name = (String) entity.getProperty("name");
+      String text = (String) entity.getProperty("text");
+      Comment myComment = new Comment(name, text);
+      comments.add(myComment);
+    }
+
+    return comments;
+  }
+
+  public void deleteAll() {
     Query query = new Query("Comment").addSort("timestamp", SortDirection.DESCENDING);
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     List<Key> keys = new ArrayList<Key>();
 
     PreparedQuery results = datastore.prepare(query);
-    for (Entity entity: results.asIterable()) {
-      keys.add(entity.getKey());
-    }
-
-    for (Key key : keys) {
-        datastore.delete(key);
+    for (Entity entity : results.asIterable()) {
+      datastore.delete(entity.getKey());
     }
   }
-
 }

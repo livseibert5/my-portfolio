@@ -14,14 +14,9 @@
 
 package com.google.sps.servlets;
 
-import com.google.appengine.api.datastore.DatastoreService;
-import com.google.appengine.api.datastore.DatastoreServiceFactory;
-import com.google.appengine.api.datastore.Entity;
-import com.google.appengine.api.datastore.PreparedQuery;
-import com.google.appengine.api.datastore.Query;
-import com.google.appengine.api.datastore.Query.SortDirection;
 import com.google.gson.Gson;
 import com.google.sps.servlets.Comment;
+import com.google.sps.servlets.DataService;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,27 +30,14 @@ public class DataServlet extends HttpServlet {
 
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    Query query = new Query("Comment").addSort("timestamp", SortDirection.DESCENDING);
-    List<Comment> comments = new ArrayList<Comment>();
-
-    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-
-    PreparedQuery results = datastore.prepare(query);
-    for (Entity entity: results.asIterable()) {
-      String name = (String) entity.getProperty("name");
-      String text = (String) entity.getProperty("text");
-      Comment myComment = new Comment(name, text);
-      comments.add(myComment);
-    }
-    
-    int max = getLimit(request);
-    if (max > comments.size()) {
-        max = comments.size();
-    }
-    comments = comments.subList(0, max);
+    List<Comment> commentsList = new ArrayList<Comment>();
+    DataService dataservice = new DataService();
+    int maxNumComments = getLimit(request);
+    //Math.min(getLimit(request), comments.size());
+    commentsList = dataservice.getComments(maxNumComments);
 
     Gson gson = new Gson();
-    String json = gson.toJson(comments);
+    String json = gson.toJson(commentsList);
 
     response.setContentType("application/json;");
     response.getWriter().println(json);
@@ -68,17 +50,24 @@ public class DataServlet extends HttpServlet {
     long timestamp = System.currentTimeMillis();
     String text = request.getParameter("comment-text");
 
-    Entity taskEntity = new Entity("Comment");
-    taskEntity.setProperty("name", name);
-    taskEntity.setProperty("timestamp", timestamp);
-    taskEntity.setProperty("text", text);
-
-    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-    datastore.put(taskEntity);
+    DataService dataservice = new DataService();
+    dataservice.makeEntity(name, timestamp, text);
 
     response.sendRedirect("/index.html");
   }
 
+  @Override
+  public void doDelete(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    DataService dataservice = new DataService();
+    dataservice.deleteAll();
+  }
+
+  /**
+   * Takes request and gets its comment-limit parameter.
+   * Default limit is 3 if val can't be read.
+   * @param {request} request from get
+   * @return {commentLimit} max # of comments to show
+   */
   private int getLimit(HttpServletRequest request) {
     String commentLimitString = request.getParameter("comment-limit");
     int commentLimit;
