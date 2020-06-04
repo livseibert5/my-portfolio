@@ -60,7 +60,7 @@ function getComments(value) {
 function deleteComments() {
   if (window.confirm("Are you sure you want to delete all comments?")) {
     const request = new Request('/data', {method:'delete'});
-    fetch(request).then(() => getComments(0));
+    fetch(request).then(() => getComments(3));
   }
 }
 
