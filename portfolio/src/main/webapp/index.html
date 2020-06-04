@@ -53,10 +53,12 @@
   </ul>
 
   <label for="comment-limit">Comments Limit:</label>
-  <input type="number" id="comment-limit" name="comment-limit" min="1" max="5" value="3" onchange="getComments(this.value)">
+  <input type="number" id="comment-limit" name="comment-limit" min="1" max="5" onchange="getComments(this.value)">
 
   <h3>Comments</h3>
   <ul id="comments-section"></ul>
+
+  <button onclick="deleteComments()">Delete Comments</button>
 
   <h3>Leave a Reply</h3>
   <form action="/data" method="post" class="comment">
@@ -70,6 +72,4 @@
   <p>Click here to change the background color randomly:</p>
   <button onclick="addRandomColor()">Change Color!</button>
 
-  <button onclick="getContent()">Fetch a message!</button>
-  <div id="content-container"></div>
 </div>

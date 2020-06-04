@@ -30,15 +30,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-/** Servlet that returns some example content. TODO: modify this file to handle comments data */
 @WebServlet("/data")
 public class DataServlet extends HttpServlet {
 
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    String commentLimitString = request.getParameter("comment-limit");
-    int commentLimit = Integer.parseInt(commentLimitString);
-
     Query query = new Query("Comment").addSort("timestamp", SortDirection.DESCENDING);
     List<Comment> comments = new ArrayList<Comment>();
 
@@ -51,8 +47,12 @@ public class DataServlet extends HttpServlet {
       Comment myComment = new Comment(name, text);
       comments.add(myComment);
     }
-
-    comments = comments.subList(0,commentLimit);
+    
+    int max = getLimit(request);
+    if (max > comments.size()) {
+        max = comments.size();
+    }
+    comments = comments.subList(0, max);
 
     Gson gson = new Gson();
     String json = gson.toJson(comments);
@@ -77,6 +77,19 @@ public class DataServlet extends HttpServlet {
     datastore.put(taskEntity);
 
     response.sendRedirect("/index.html");
+  }
+
+  private int getLimit(HttpServletRequest request) {
+    String commentLimitString = request.getParameter("comment-limit");
+    int commentLimit;
+
+    try {
+      commentLimit = Integer.parseInt(commentLimitString);
+    } catch (NumberFormatException e) {
+        return 3;
+    }
+
+    return commentLimit;
   }
 
 }

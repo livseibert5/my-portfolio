@@ -26,21 +26,6 @@ function addRandomColor() {
   document.body.style.backgroundColor = color;
 }
 
-function getContent() {
-  const responsePromise = fetch('/data');
-  responsePromise.then(handleResponse);
-}
-
-function handleResponse(response) {
-  const textPromise = response.text();
-  textPromise.then(addMessageToDom);
-}
-
-function addMessageToDom(message) {
-  const messageContainer = document.getElementById('content-container');
-  messageContainer.innerText = message;
-}
-
 document.addEventListener('DOMContentLoaded', getComments(3));
 
 function getComments(value) {
@@ -60,6 +45,11 @@ function getComments(value) {
     }}).catch(() => {
       console.error("JSON from servlet is bad or is being handled wrong on fetch.");
   });
+}
+
+function deleteComments() {
+  const request = new Request('/delete-data', {method:'POST'});
+  fetch(request).then(() => getComments(0));
 }
 
 /**
