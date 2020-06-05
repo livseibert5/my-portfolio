@@ -15,8 +15,6 @@
 package com.google.sps.servlets;
 
 import com.google.gson.Gson;
-import com.google.sps.servlets.Comment;
-import com.google.sps.servlets.DataService;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +31,6 @@ public class DataServlet extends HttpServlet {
     List<Comment> commentsList = new ArrayList<Comment>();
     DataService dataservice = new DataService();
     int maxNumComments = getLimit(request);
-    //Math.min(getLimit(request), comments.size());
     commentsList = dataservice.getComments(maxNumComments);
 
     Gson gson = new Gson();
@@ -75,7 +72,7 @@ public class DataServlet extends HttpServlet {
     try {
       commentLimit = Integer.parseInt(commentLimitString);
     } catch (NumberFormatException e) {
-        return 3;
+      return 3;
     }
 
     return commentLimit;

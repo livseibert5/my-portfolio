@@ -28,7 +28,7 @@ function addRandomColor() {
 
 document.addEventListener('DOMContentLoaded', () => {
   try {
-    let lim = parseInt(localStorage.getItem("commentLim"));
+    let lim = parseInt(sessionStorage.getItem("commentLim"));
     getComments(lim);
   } catch(err) {
     console.log(err);
@@ -37,8 +37,8 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function getComments(value) {
-  localStorage.clear();
-  localStorage.setItem("commentLim", value.toString());
+  sessionStorage.clear();
+  sessionStorage.setItem("commentLim", value.toString());
   let url = '/data?comment-limit=' + value.toString();
   fetch(url).then((response) => response.json()).then((comments) => {
     const commentsListElement = document.getElementById('comments-section');
