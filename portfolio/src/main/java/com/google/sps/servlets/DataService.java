@@ -31,9 +31,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-/**
- * handles all the datastore actions
- */
+/** Handles all the datastore actions. */
 public class DataService {
 
   public void saveComment(Comment comment) {
@@ -49,10 +47,11 @@ public class DataService {
   public List<Comment> getComments(int commentLimit) {
     Query query = new Query("Comment").addSort("timestamp", SortDirection.DESCENDING);
     List<Comment> comments = new ArrayList<Comment>();
-
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 
-    List<Entity> results = datastore.prepare(query).asList(FetchOptions.Builder.withLimit(commentLimit));
+    List<Entity> results = 
+    datastore.prepare(query).asList(FetchOptions.Builder.withLimit(commentLimit));
+    
     for (Entity entity: results) {
       String name = (String) entity.getProperty("name");
       String text = (String) entity.getProperty("text");
@@ -63,7 +62,7 @@ public class DataService {
     return comments;
   }
 
-  public void deleteAll() {
+  public void deleteAllComments() {
     Query query = new Query("Comment");
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 

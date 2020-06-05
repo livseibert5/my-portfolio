@@ -41,8 +41,8 @@ public class DataServlet extends HttpServlet {
   }
 
   /**
-   * Takes request and gets its comment-limit parameter.
-   * Default limit is 3 if val can't be read.
+   * Takes request and gets its commentLimit parameter.
+   * Default limit is 3 if commentLimit can't be read.
    * @param {request} request from get
    * @return {commentLimit} max # of comments to show
    */
@@ -75,6 +75,6 @@ public class DataServlet extends HttpServlet {
   @Override
   public void doDelete(HttpServletRequest request, HttpServletResponse response) throws IOException {
     DataService dataService = new DataService();
-    dataService.deleteAll();
+    dataService.deleteAllComments();
   }
 }

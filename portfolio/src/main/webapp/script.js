@@ -30,8 +30,8 @@ document.addEventListener('DOMContentLoaded', () => {
   try {
     let lim = parseInt(sessionStorage.getItem("commentLim"));
     getComments(lim);
-  } catch(err) {
-    console.log(err);
+  } catch {
+    console.error("Can't read commentLim parameter from storage.");
     getComments(3);
   }
 });
