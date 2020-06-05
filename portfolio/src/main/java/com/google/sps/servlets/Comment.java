@@ -21,7 +21,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-//represents a comment with the user's name, text,and timestamp
+/**
+ * represents a comment with the user's name,
+ * text,and timestamp
+ */
 public class Comment {
 
   private final String name;
@@ -32,5 +35,17 @@ public class Comment {
     this.timestamp = System.currentTimeMillis();
     this.name = name;
     this.text = text;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public long getTime() {
+    return timestamp;
+  }
+
+  public String getText() {
+    return text;
   }
 }

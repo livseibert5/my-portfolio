@@ -31,14 +31,16 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-//handles all the datastore actions
+/**
+ * handles all the datastore actions
+ */
 public class DataService {
 
-  public void makeEntity(String name, long timestamp, String text) {
+  public void saveComment(Comment comment) {
     Entity taskEntity = new Entity("Comment");
-    taskEntity.setProperty("name", name);
-    taskEntity.setProperty("timestamp", timestamp);
-    taskEntity.setProperty("text", text);
+    taskEntity.setProperty("name", comment.getName());
+    taskEntity.setProperty("timestamp", comment.getTime());
+    taskEntity.setProperty("text", comment.getText());
 
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     datastore.put(taskEntity);
@@ -62,9 +64,8 @@ public class DataService {
   }
 
   public void deleteAll() {
-    Query query = new Query("Comment").addSort("timestamp", SortDirection.DESCENDING);
+    Query query = new Query("Comment");
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-    List<Key> keys = new ArrayList<Key>();
 
     PreparedQuery results = datastore.prepare(query);
     for (Entity entity : results.asIterable()) {

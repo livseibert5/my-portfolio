@@ -28,10 +28,9 @@ public class DataServlet extends HttpServlet {
 
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    List<Comment> commentsList = new ArrayList<Comment>();
-    DataService dataservice = new DataService();
+    DataService dataService = new DataService();
     int maxNumComments = getLimit(request);
-    commentsList = dataservice.getComments(maxNumComments);
+    List<Comment> commentsList = dataService.getComments(maxNumComments);
 
     Gson gson = new Gson();
     String json = gson.toJson(commentsList);
@@ -41,24 +40,6 @@ public class DataServlet extends HttpServlet {
 
   }
 
-  @Override
-  public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    String name = request.getParameter("name");
-    long timestamp = System.currentTimeMillis();
-    String text = request.getParameter("comment-text");
-
-    DataService dataservice = new DataService();
-    dataservice.makeEntity(name, timestamp, text);
-
-    response.sendRedirect("/index.html");
-  }
-
-  @Override
-  public void doDelete(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    DataService dataservice = new DataService();
-    dataservice.deleteAll();
-  }
-
   /**
    * Takes request and gets its comment-limit parameter.
    * Default limit is 3 if val can't be read.
@@ -66,7 +47,7 @@ public class DataServlet extends HttpServlet {
    * @return {commentLimit} max # of comments to show
    */
   private int getLimit(HttpServletRequest request) {
-    String commentLimitString = request.getParameter("comment-limit");
+    String commentLimitString = request.getParameter("commentLimit");
     int commentLimit;
 
     try {
@@ -78,4 +59,22 @@ public class DataServlet extends HttpServlet {
     return commentLimit;
   }
 
+  @Override
+  public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    String name = request.getParameter("name");
+    long timestamp = System.currentTimeMillis();
+    String text = request.getParameter("comment-text");
+
+    DataService dataService = new DataService();
+    Comment comment = new Comment(name, text);
+    dataService.saveComment(comment);
+
+    response.sendRedirect("/index.html");
+  }
+
+  @Override
+  public void doDelete(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    DataService dataService = new DataService();
+    dataService.deleteAll();
+  }
 }

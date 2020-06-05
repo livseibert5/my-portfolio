@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
 function getComments(value) {
   sessionStorage.clear();
   sessionStorage.setItem("commentLim", value.toString());
-  let url = '/data?comment-limit=' + value.toString();
+  const url = `/data?commentLimit=${value}`;
   fetch(url).then((response) => response.json()).then((comments) => {
     const commentsListElement = document.getElementById('comments-section');
     if (comments.length == 0) {
