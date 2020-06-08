@@ -87,6 +87,12 @@ function createCommentElement(name, text) {
   return commentElement;
 }
 
+/**
+ * Defines map styling, pre-determined markers, and the info text for those
+ * markers. Then, it creates the map and puts the markers on it, each
+ * with an onclick event listener to display the info text. Lastly,
+ * it fetches the markers that the user inputs.
+ */
 function initMap() {
   const styledMapType = new google.maps.StyledMapType(
       [
@@ -142,14 +148,14 @@ function initMap() {
     [cameron, 'Cameron Indoor Stadium', cameronInfo]
   ];
 
-  const infowindow = new google.maps.InfoWindow();
+  const infoWindow = new google.maps.InfoWindow();
 
   markers.forEach((marker) => {
     const mark = new google.maps.Marker({position: marker[0], map: map, title: marker[1]});
     google.maps.event.addListener(mark, 'click', function(){
-        infowindow.close();
-        infowindow.setContent(`<div id="infowindow">${marker[2]}</div>`);
-        infowindow.open(map, mark);
+        infoWindow.close();
+        infoWindow.setContent(`<div id="infowindow">${marker[2]}</div>`);
+        infoWindow.open(map, mark);
     });
   })
 
