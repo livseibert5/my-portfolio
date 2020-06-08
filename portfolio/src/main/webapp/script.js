@@ -116,11 +116,16 @@ function initMap() {
         {"featureType": "water", "elementType": "labels.text.fill", "stylers": [{"color": "#92998d"}]}]);
   
   const heavBuffs = {lat:36.009670, lng: -78.920311};
-  const shooters = {lat: 36.001049, lng: -78.909508};
-  const devines = {lat: 36.000480, lng: 36.000480};
   const chapel = {lat: 36.000591, lng: -78.937494};
-  const local = {lat: 36.007231, lng: -78.92685};
   const cameron = {lat: 35.997201, lng: -78.944451};
+
+  const heavBuffsInfo = '<h3 id="firstHeading" class="firstHeading">Heavenly Buffaloes</h3>'+
+    '<p>Heavenly Buffaloes, home of my favorite food, ' +
+    'vegan thai chili wings.';
+  const chapelInfo = '<h3 id="firstHeading" class="firstHeading">Duke Chapel</h3>'+
+    '<p>Duke Chapel, Duke\'s prettiest on campus location.';
+  const cameronInfo = '<h3 id="firstHeading" class="firstHeading">Cameon Indoor</h3>'+
+    '<p>Cameron Indoor Stadium, the best place on earth to watch college basketball.';
 
   const map = new google.maps.Map(document.getElementById('map'), {
                 center: {lat: 36.0, lng: -78.94},
@@ -132,16 +137,20 @@ function initMap() {
               });
   
   const markers = [
-    [heavBuffs, 'Heavenly Buffaloes'],
-    [shooters, 'Shooters Saloon'],
-    [devines, 'Devines'],
-    [chapel, 'Duke Chapel'],
-    [local, 'Local 22 Restaurant'],
-    [cameron, 'Cameron Indoor Stadium']
+    [heavBuffs, 'Heavenly Buffaloes', heavBuffsInfo],
+    [chapel, 'Duke Chapel', chapelInfo],
+    [cameron, 'Cameron Indoor Stadium', cameronInfo]
   ];
+
+  const infowindow = new google.maps.InfoWindow();
 
   markers.forEach((marker) => {
     const mark = new google.maps.Marker({position: marker[0], map: map, title: marker[1]});
+    google.maps.event.addListener(mark, 'click', function(){
+        infowindow.close();
+        infowindow.setContent(`<div id="infowindow">${marker[2]}</div>`);
+        infowindow.open(map, mark);
+    });
   })
 
   map.mapTypes.set('styled_map', styledMapType);
