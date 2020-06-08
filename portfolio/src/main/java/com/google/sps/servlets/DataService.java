@@ -25,6 +25,7 @@ import com.google.appengine.api.datastore.Query.SortDirection;
 import com.google.gson.Gson;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.*;
 import javax.servlet.annotation.WebServlet;
@@ -70,5 +71,34 @@ public class DataService {
     PreparedQuery results = datastore.prepare(query);
     StreamSupport.stream(results.asIterable().spliterator(), false)
                  .forEach((entity) -> datastore.delete(entity.getKey()));
+  }
+
+  public void storeMarker(Marker marker) {
+    Entity markerEntity = new Entity("Marker");
+    markerEntity.setProperty("lat", marker.getLat());
+    markerEntity.setProperty("lng", marker.getLng());
+    markerEntity.setProperty("content", marker.getContent());
+
+    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+    datastore.put(markerEntity);
+  }
+
+  /** Fetches markers from Datastore. */
+  public Collection<Marker> getMarkers() {
+    Collection<Marker> markers = new ArrayList<>();
+
+    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+    Query query = new Query("Marker");
+    PreparedQuery results = datastore.prepare(query);
+
+    for (Entity entity : results.asIterable()) {
+      double lat = (double) entity.getProperty("lat");
+      double lng = (double) entity.getProperty("lng");
+      String content = (String) entity.getProperty("content");
+
+      Marker marker = new Marker(lat, lng, content);
+      markers.add(marker);
+    }
+    return markers;
   }
 }
