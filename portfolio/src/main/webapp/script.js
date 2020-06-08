@@ -114,15 +114,35 @@ function initMap() {
         {"featureType": "transit.station", "elementType": "geometry", "stylers": [{"color": "#dfd2ae"}]},
         {"featureType": "water", "elementType": "geometry.fill", "stylers": [{"color": "#b9d3c2"}]},
         {"featureType": "water", "elementType": "labels.text.fill", "stylers": [{"color": "#92998d"}]}]);
+  
+  const heavBuffs = {lat:36.009670, lng: -78.920311};
+  const shooters = {lat: 36.001049, lng: -78.909508};
+  const devines = {lat: 36.000480, lng: 36.000480};
+  const chapel = {lat: 36.000591, lng: -78.937494};
+  const local = {lat: 36.007231, lng: -78.92685};
+  const cameron = {lat: 35.997201, lng: -78.944451};
 
   const map = new google.maps.Map(document.getElementById('map'), {
                 center: {lat: 36.0, lng: -78.94},
-                zoom: 11,
+                zoom: 13,
                 mapTypeControlOptions: {
                   mapTypeIds: ['roadmap', 'satellite', 'hybrid', 'terrain',
                     'styled_map']
                 }
               });
+  
+  const markers = [
+    [heavBuffs, 'Heavenly Buffaloes'],
+    [shooters, 'Shooters Saloon'],
+    [devines, 'Devines'],
+    [chapel, 'Duke Chapel'],
+    [local, 'Local 22 Restaurant'],
+    [cameron, 'Cameron Indoor Stadium']
+  ];
+
+  markers.forEach((marker) => {
+    const mark = new google.maps.Marker({position: marker[0], map: map, title: marker[1]});
+  })
 
   map.mapTypes.set('styled_map', styledMapType);
   map.setMapTypeId('styled_map');
