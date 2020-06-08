@@ -3,6 +3,11 @@
 <title>My Portfolio</title>
 <link rel="stylesheet" href="style.css">
 <script src="script.js"></script>
+
+<template id="comment-template">
+  <li>[<span class="name"></span>] <span class="text"></span>
+</template>
+
 <div id="content">
   <h1>Livia's Portfolio</h1>
   <nav class="navbar">
@@ -47,9 +52,24 @@
     <li><a href="https://github.com/livseibert5">GitHub</a>
   </ul>
 
+  <label for="commentLimit">Comments Limit:</label>
+  <input type="number" id="commentLimit" name="commentLimit" min="1" max="5" onchange="getComments(this.value)">
+
+  <h3>Comments</h3>
+  <ul id="comments-section"></ul>
+
+  <button onclick="deleteComments()">Delete Comments</button>
+
+  <h3>Leave a Reply</h3>
+  <form action="/data" method="post" class="comment">
+    <label for="name">Name:</label>
+    <input type="text" name="name">
+    <label for="comment-text">Comment:</label>
+    <input type="text" name="comment-text">
+    <input type="submit">
+  </form>
+
   <p>Click here to change the background color randomly:</p>
   <button onclick="addRandomColor()">Change Color!</button>
 
-  <button onclick="getContent()">Fetch a message!</button>
-  <div id="content-container"></div>
 </div>

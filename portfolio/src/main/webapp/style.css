@@ -107,6 +107,27 @@ article {
   width: 100%;
 }
 
+.comment label,
+.comment input {
+  display: block;
+  margin: .5rem 0; /** top-bottom=1/2 base font size; left-right=0 */
+}
+
+.comment input[type=submit] {
+  margin: 1rem 0 .5rem 0;
+}
+
+#comments-section {
+  list-style: none;
+  padding-left: 0px;
+}
+
+#comments-section li {
+  list-style-type: none;
+  padding-bottom: 15px;
+  padding-left: 0px;
+}
+
 h1,
 h3,
 h4,

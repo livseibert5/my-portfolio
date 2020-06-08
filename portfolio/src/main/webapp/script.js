@@ -26,17 +26,63 @@ function addRandomColor() {
   document.body.style.backgroundColor = color;
 }
 
-function getContent() {
-  const responsePromise = fetch('/data');
-  responsePromise.then(handleResponse);
+document.addEventListener('DOMContentLoaded', () => {
+  try {
+    let lim = parseInt(sessionStorage.getItem("commentLim"));
+    getComments(lim);
+  } catch {
+    console.error("Can't read commentLim parameter from storage.");
+    getComments(3);
+  }
+});
+
+/** 
+ * Gets json data for comments from the server and
+ * displays them on the front end.
+ * @param {value} number of comments to be displayed
+ */
+function getComments(value) {
+  sessionStorage.clear();
+  sessionStorage.setItem("commentLim", value.toString());
+  const url = `/data?commentLimit=${value}`;
+  fetch(url).then((response) => response.json()).then((comments) => {
+    const commentsListElement = document.getElementById('comments-section');
+    if (comments.length == 0) {
+      commentsListElement.innerHTML = 'Nothing to show.';
+    } else {
+      commentsListElement.innerHTML = '';
+      comments.forEach((comment) => {
+        const name = comment.name;
+        const text = comment.text;
+        const element = createCommentElement(name, text);
+        commentsListElement.appendChild(element);
+      })
+    }
+    }).catch(() => {
+      console.error("JSON from servlet is bad or is being handled wrong on fetch.");
+  });
 }
 
-function handleResponse(response) {
-  const textPromise = response.text();
-  textPromise.then(addMessageToDom);
+function deleteComments() {
+  if (window.confirm("Are you sure you want to delete all comments?")) {
+    const request = new Request('/data', {method:'delete'});
+    fetch(request).then(() => getComments(3));
+  }
 }
 
-function addMessageToDom(message) {
-  const messageContainer = document.getElementById('content-container');
-  messageContainer.innerText = message;
+/**
+ * Takes text and name of a comment and puts
+ * it in a list element to be displayed.
+ * @param {name} name of user commenting
+ * @param {text} text of comment
+ * @return {commentElement} list element to hold comment
+ */
+function createCommentElement(name, text) {
+  const commentTemplate = document.getElementById('comment-template');
+  const commentElement = commentTemplate.content.cloneNode(true);
+
+  commentElement.querySelector(".name").innerText = name;
+  commentElement.querySelector(".text").innerText = text;
+
+  return commentElement;
 }
