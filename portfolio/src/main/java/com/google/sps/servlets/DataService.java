@@ -26,6 +26,7 @@ import com.google.gson.Gson;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.*;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -67,8 +68,7 @@ public class DataService {
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 
     PreparedQuery results = datastore.prepare(query);
-    for (Entity entity : results.asIterable()) {
-      datastore.delete(entity.getKey());
-    }
+    StreamSupport.stream(results.asIterable().spliterator(), false)
+                 .forEach((entity) -> datastore.delete(entity.getKey()));
   }
 }
