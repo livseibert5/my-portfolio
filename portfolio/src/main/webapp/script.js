@@ -36,6 +36,11 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
+/** 
+ * Gets json data for comments from the server and
+ * displays them on the front end.
+ * @param {value} number of comments to be displayed
+ */
 function getComments(value) {
   sessionStorage.clear();
   sessionStorage.setItem("commentLim", value.toString());
@@ -52,7 +57,8 @@ function getComments(value) {
         const element = createCommentElement(name, text);
         commentsListElement.appendChild(element);
       })
-    }}).catch(() => {
+    }
+    }).catch(() => {
       console.error("JSON from servlet is bad or is being handled wrong on fetch.");
   });
 }
