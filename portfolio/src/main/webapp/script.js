@@ -26,6 +26,15 @@ function addRandomColor() {
   document.body.style.backgroundColor = color;
 }
 
+document.addEventListener('DOMContentLoaded', userAuth());
+function userAuth() {
+  const request = new Request('/auth', {method:'get'});
+  fetch(request).then(response => response.text()).then((text) => {
+    const loginBox = document.getElementById('login');
+    loginBox.innerHTML = text;
+  })
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   try {
     let lim = parseInt(sessionStorage.getItem("commentLim"));
