@@ -27,15 +27,39 @@ function addRandomColor() {
 }
 
 document.addEventListener('DOMContentLoaded', userAuth());
+
 function userAuth() {
   const request = new Request('/auth', {method:'get'});
-  fetch(request).then(response => response.text()).then((text) => {
-    const loginBox = document.getElementById('login');
-    loginBox.innerHTML = text;
+  fetch(request).then(response => response.text()).then((html) => {
+    const parser = new DOMParser();
+    const content = parser.parseFromString(html, 'text/html');
+    const loginBox = document.getElementById('log');
+    const welcomeBox = document.getElementById('welcome');
+    welcomeBox.innterHTML = content.getElementById('user').innerHTML;
+
+    if (content.getElementById('login')) {
+      loginBox.innerHTML = content.getElementById('login').innerHTML;
+      document.getElementById("limit-setter").classList.add("hidden");
+      document.getElementById("delete-comments").classList.add("hidden");
+      document.getElementById("reply-form").classList.add("hidden");
+    } else {
+      loginBox.innerHTML = content.getElementById('logout').innerHTML;
+      document.getElementById("limit-setter").classList.remove("hidden");
+      document.getElementById("delete-comments").classList.remove("hidden");
+      document.getElementById("reply-form").classList.remove("hidden");
+      
+      try {
+        let lim = parseInt(sessionStorage.getItem("commentLim"));
+        getComments(lim);
+      } catch {
+        console.error("Can't read commentLim param from storage.");
+        getComments(3);
+      }
+    }
   })
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+/**document.addEventListener('DOMContentLoaded', () => {
   try {
     let lim = parseInt(sessionStorage.getItem("commentLim"));
     getComments(lim);
@@ -43,7 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
     console.error("Can't read commentLim parameter from storage.");
     getComments(3);
   }
-});
+});*/
 
 /** 
  * Gets json data for comments from the server and
