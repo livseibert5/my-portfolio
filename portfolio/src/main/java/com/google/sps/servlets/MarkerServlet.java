@@ -16,8 +16,7 @@ package com.google.sps.servlets;
 
 import com.google.gson.Gson;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -37,7 +36,7 @@ public final class MarkerServlet extends HttpServlet {
     response.setContentType("application/json");
 
     DataService dataService = new DataService();
-    Collection<Marker> markers = dataService.getMarkers();
+    List<Marker> markers = dataService.getMarkers();
     Gson gson = new Gson();
     String json = gson.toJson(markers);
 

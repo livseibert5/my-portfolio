@@ -18,12 +18,10 @@ import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.FetchOptions;
-import com.google.appengine.api.datastore.FetchOptions.Builder;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Query.SortDirection;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -69,28 +67,23 @@ public class DataService {
   /** Puts markers into Datastore. */
   public void storeMarker(Marker marker) {
     Entity markerEntity = new Entity("Marker");
-    markerEntity.setProperty("lat", marker.getLat());
-    markerEntity.setProperty("lng", marker.getLng());
+    markerEntity.setProperty("latitude", marker.getLat());
+    markerEntity.setProperty("longitude", marker.getLng());
     markerEntity.setProperty("content", marker.getContent());
 
     datastore.put(markerEntity);
   }
 
   /** Fetches markers from Datastore. */
-  public Collection<Marker> getMarkers() {
-    Collection<Marker> markers = new ArrayList<>();
-
+  public List<Marker> getMarkers() {
     Query query = new Query("Marker");
     PreparedQuery results = datastore.prepare(query);
 
-    for (Entity entity : results.asIterable()) {
-      double lat = (double) entity.getProperty("lat");
-      double lng = (double) entity.getProperty("lng");
-      String content = (String) entity.getProperty("content");
-
-      Marker marker = new Marker(lat, lng, content);
-      markers.add(marker);
-    }
-    return markers;
+    return results.asList(FetchOptions.Builder.withDefaults())
+        .stream().map(entity -> new Marker(
+          (double) entity.getProperty("latitude"),
+          (double) entity.getProperty("longitude"),
+          (String) entity.getProperty("content")
+        )).collect(Collectors.toList());
   }
 }
