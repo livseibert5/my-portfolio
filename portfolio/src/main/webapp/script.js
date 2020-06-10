@@ -89,6 +89,7 @@ function createCommentElement(name, text) {
 
 let editMarker;
 let map;
+
 /**
  * Defines map styling, pre-determined markers, and the info text for those
  * markers. Then, it creates the map and puts the markers on it, each
