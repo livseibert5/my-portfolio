@@ -14,35 +14,34 @@
 
 package com.google.sps.servlets;
 
-import com.google.gson.Gson;
 import java.io.IOException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-/** Represents a comment with the user's name, text, and timestamp. */
-public final class Comment {
+/** Represents a marker on the map. */
+public final class Marker {
 
-  private final String name;
-  private final long timestamp;
-  private final String text;
+  private final double latitude;
+  private final double longitude;
+  private final String content;
 
-  public Comment(String name, String text) {
-    this.timestamp = System.currentTimeMillis();
-    this.name = name;
-    this.text = text;
+  public Marker(double latitude, double longitude, String content) {
+    this.latitude = latitude;
+    this.longitude = longitude;
+    this.content = content;
   }
 
-  public String getName() {
-    return name;
+  public double getLat() {
+    return latitude;
   }
 
-  public long getTime() {
-    return timestamp;
+  public double getLng() {
+    return longitude;
   }
 
-  public String getText() {
-    return text;
+  public String getContent() {
+    return content;
   }
 }
