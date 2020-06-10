@@ -22,7 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /** Represents a comment with the user's name, text, and timestamp. */
-public class Comment {
+public final class Comment {
 
   private final String name;
   private final long timestamp;

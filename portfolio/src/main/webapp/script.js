@@ -26,8 +26,6 @@ function addRandomColor() {
   document.body.style.backgroundColor = color;
 }
 
-document.addEventListener('DOMContentLoaded', userAuth());
-
 function userAuth() {
   const request = new Request('/auth', {method:'get'});
   fetch(request).then(response => response.text()).then((html) => {
@@ -42,11 +40,13 @@ function userAuth() {
       document.getElementById("limit-setter").classList.add("hidden");
       document.getElementById("delete-comments").classList.add("hidden");
       document.getElementById("reply-form").classList.add("hidden");
+      sessionStorage.setItem("log", "loggedOut");
     } else {
       loginBox.innerHTML = content.getElementById('logout').innerHTML;
       document.getElementById("limit-setter").classList.remove("hidden");
       document.getElementById("delete-comments").classList.remove("hidden");
       document.getElementById("reply-form").classList.remove("hidden");
+      sessionStorage.setItem("log", "loggedIn");
       
       try {
         let lim = parseInt(sessionStorage.getItem("commentLim"));
@@ -59,23 +59,12 @@ function userAuth() {
   })
 }
 
-/**document.addEventListener('DOMContentLoaded', () => {
-  try {
-    let lim = parseInt(sessionStorage.getItem("commentLim"));
-    getComments(lim);
-  } catch {
-    console.error("Can't read commentLim parameter from storage.");
-    getComments(3);
-  }
-});*/
-
 /** 
  * Gets json data for comments from the server and
  * displays them on the front end.
  * @param {value} number of comments to be displayed
  */
 function getComments(value) {
-  sessionStorage.clear();
   sessionStorage.setItem("commentLim", value.toString());
   const url = `/data?commentLimit=${value}`;
   fetch(url).then((response) => response.json()).then((comments) => {
@@ -197,11 +186,16 @@ function initMap() {
   map.mapTypes.set('styled_map', styledMapType);
   map.setMapTypeId('styled_map');
 
-  map.addListener('click', (event) => {
-    createMarkerForEdit(event.latLng.lat(), event.latLng.lng());
-  });
+  if (sessionStorage.getItem("log") === "loggedIn") {
+    document.getElementById("add-marker").classList.remove("hidden");
+    map.addListener('click', (event) => {
+      createMarkerForEdit(event.latLng.lat(), event.latLng.lng());
+    });
 
-  fetchMarkers();
+    fetchMarkers();
+  } else {
+    document.getElementById("add-marker").classList.add("hidden");
+  }
 }
 
 /** Fetches markers from the backend and adds them to the map. */
