@@ -25,6 +25,9 @@ import javax.servlet.http.HttpServletResponse;
 @WebServlet("/auth")
 public class AuthServlet extends HttpServlet {
 
+  private final static String LOGOUT_REDIRECT_URL = "/";
+  private final static String LOGIN_REDIRECT_URL = "/";
+
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
     response.setContentType("text/html");
@@ -32,14 +35,12 @@ public class AuthServlet extends HttpServlet {
     UserService userService = UserServiceFactory.getUserService();
     if (userService.isUserLoggedIn()) {
       String userEmail = userService.getCurrentUser().getEmail();
-      String urlToRedirectToAfterUserLogsOut = "/";
-      String logoutUrl = userService.createLogoutURL(urlToRedirectToAfterUserLogsOut);
+      String logoutUrl = userService.createLogoutURL(LOGOUT_REDIRECT_URL);
 
       response.getWriter().println("<p id='user'>Hello " + userEmail + "!</p>");
       response.getWriter().println("<p id='logout'>Logout <a href=\"" + logoutUrl + "\">here</a>.</p>");
     } else {
-      String urlToRedirectToAfterUserLogsIn = "/";
-      String loginUrl = userService.createLoginURL(urlToRedirectToAfterUserLogsIn);
+      String loginUrl = userService.createLoginURL(LOGIN_REDIRECT_URL);
 
       response.getWriter().println("<p id='user'>Hello user.</p>");
       response.getWriter().println("<p id='login'>Login <a href=\"" + loginUrl + "\">here</a>.</p>");

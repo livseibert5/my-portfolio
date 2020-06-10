@@ -18,18 +18,17 @@ import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.FetchOptions;
-import com.google.appengine.api.datastore.FetchOptions.Builder;
-import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Query.SortDirection;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
 /** Handles all the datastore actions. */
-public class DataService {
+public final class DataService {
+
+  private final DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 
   public void saveComment(Comment comment) {
     Entity taskEntity = new Entity("Comment");
@@ -37,14 +36,12 @@ public class DataService {
     taskEntity.setProperty("timestamp", comment.getTime());
     taskEntity.setProperty("text", comment.getText());
 
-    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     datastore.put(taskEntity);
   }
 
   public List<Comment> getComments(int commentLimit) {
     Query query = new Query("Comment").addSort("timestamp", SortDirection.DESCENDING);
     List<Comment> comments = new ArrayList<Comment>();
-    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 
     List<Entity> results = 
     datastore.prepare(query).asList(FetchOptions.Builder.withLimit(commentLimit));
@@ -61,39 +58,32 @@ public class DataService {
 
   public void deleteAllComments() {
     Query query = new Query("Comment");
-    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 
     PreparedQuery results = datastore.prepare(query);
     results.asList(FetchOptions.Builder.withDefaults()).stream()
       .forEach(entity -> datastore.delete(entity.getKey()));
   }
-
+  
+  /** Puts markers into Datastore. */
   public void storeMarker(Marker marker) {
     Entity markerEntity = new Entity("Marker");
     markerEntity.setProperty("lat", marker.getLat());
     markerEntity.setProperty("lng", marker.getLng());
     markerEntity.setProperty("content", marker.getContent());
 
-    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     datastore.put(markerEntity);
   }
 
-  /** Fetches markers from Datastore. */
-  public Collection<Marker> getMarkers() {
-    Collection<Marker> markers = new ArrayList<>();
-
-    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+/** Fetches markers from Datastore. */
+  public List<Marker> getMarkers() {
     Query query = new Query("Marker");
     PreparedQuery results = datastore.prepare(query);
 
-    for (Entity entity : results.asIterable()) {
-      double lat = (double) entity.getProperty("lat");
-      double lng = (double) entity.getProperty("lng");
-      String content = (String) entity.getProperty("content");
-
-      Marker marker = new Marker(lat, lng, content);
-      markers.add(marker);
-    }
-    return markers;
+    return results.asList(FetchOptions.Builder.withDefaults())
+        .stream().map(entity -> new Marker(
+          (double) entity.getProperty("latitude"),
+          (double) entity.getProperty("longitude"),
+          (String) entity.getProperty("content")
+        )).collect(Collectors.toList());
   }
 }
