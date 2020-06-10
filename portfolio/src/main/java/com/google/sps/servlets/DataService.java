@@ -37,20 +37,20 @@ import javax.servlet.http.HttpServletResponse;
 /** Handles all the datastore actions. */
 public class DataService {
 
+  private final DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+
   public void saveComment(Comment comment) {
     Entity taskEntity = new Entity("Comment");
     taskEntity.setProperty("name", comment.getName());
     taskEntity.setProperty("timestamp", comment.getTime());
     taskEntity.setProperty("text", comment.getText());
 
-    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     datastore.put(taskEntity);
   }
 
   public List<Comment> getComments(int commentLimit) {
     Query query = new Query("Comment").addSort("timestamp", SortDirection.DESCENDING);
     List<Comment> comments = new ArrayList<Comment>();
-    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 
     List<Entity> results = 
     datastore.prepare(query).asList(FetchOptions.Builder.withLimit(commentLimit));
@@ -67,20 +67,19 @@ public class DataService {
 
   public void deleteAllComments() {
     Query query = new Query("Comment");
-    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 
     PreparedQuery results = datastore.prepare(query);
     results.asList(FetchOptions.Builder.withDefaults()).stream()
       .forEach(entity -> datastore.delete(entity.getKey()));
   }
 
+  /** Puts markers into Datastore. */
   public void storeMarker(Marker marker) {
     Entity markerEntity = new Entity("Marker");
     markerEntity.setProperty("lat", marker.getLat());
     markerEntity.setProperty("lng", marker.getLng());
     markerEntity.setProperty("content", marker.getContent());
 
-    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     datastore.put(markerEntity);
   }
 
@@ -88,7 +87,6 @@ public class DataService {
   public Collection<Marker> getMarkers() {
     Collection<Marker> markers = new ArrayList<>();
 
-    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     Query query = new Query("Marker");
     PreparedQuery results = datastore.prepare(query);
 

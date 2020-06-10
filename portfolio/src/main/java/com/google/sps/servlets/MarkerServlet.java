@@ -25,8 +25,12 @@ import javax.servlet.http.HttpServletResponse;
 import org.jsoup.Jsoup;
 import org.jsoup.safety.Whitelist;
 
+/**
+ * Servlet that handles the creation and storage of
+ * a new marker when the user clicks on the map.
+ */
 @WebServlet("/markers")
-public class MarkerServlet extends HttpServlet {
+public final class MarkerServlet extends HttpServlet {
 
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -42,15 +46,13 @@ public class MarkerServlet extends HttpServlet {
 
   @Override
   public void doPost(HttpServletRequest request, HttpServletResponse response) {
-    double lat = Double.parseDouble(request.getParameter("lat"));
-    double lng = Double.parseDouble(request.getParameter("lng"));
+    double latitude = Double.parseDouble(request.getParameter("latitude"));
+    double longitude = Double.parseDouble(request.getParameter("longitude"));
     String content = Jsoup.clean(request.getParameter("content"), Whitelist.none());
 
-    Marker marker = new Marker(lat, lng, content);
+    Marker marker = new Marker(latitude, longitude, content);
 
     DataService dataService = new DataService();
     dataService.storeMarker(marker);
   }
-
-  
 }

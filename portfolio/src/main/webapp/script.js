@@ -176,14 +176,14 @@ function fetchMarkers() {
   fetch('/markers').then(response => response.json()).then((markers) => {
     markers.forEach(
         (marker) => {
-            createMarkerForDisplay(marker.lat, marker.lng, marker.content)});
+            createMarkerForDisplay(marker.latitude, marker.longitude, marker.content)});
   });
 }
 
 /** Creates a marker that shows a read-only info window when clicked. */
-function createMarkerForDisplay(lat, lng, content) {
+function createMarkerForDisplay(latitude, longitude, content) {
   const marker =
-      new google.maps.Marker({position: {lat: lat, lng: lng}, map: map});
+      new google.maps.Marker({position: {lat: latitude, lng: longitude}, map: map});
 
   const infoWindow = new google.maps.InfoWindow({content: content});
   marker.addListener('click', () => {
@@ -192,27 +192,27 @@ function createMarkerForDisplay(lat, lng, content) {
 }
 
 /** Sends a marker to the backend for saving. */
-function postMarker(lat, lng, content) {
+function postMarker(latitude, longitude, content) {
   const params = new URLSearchParams();
-  params.append('lat', lat);
-  params.append('lng', lng);
+  params.append('latitude', latitude);
+  params.append('longitude', longitude);
   params.append('content', content);
 
   fetch('/markers', {method: 'POST', body: params});
 }
 
 /** Creates a marker that shows a textbox the user can edit. */
-function createMarkerForEdit(lat, lng) {
+function createMarkerForEdit(latitude, longitude) {
   // If we're already showing an editable marker, then remove it.
   if (editMarker) {
     editMarker.setMap(null);
   }
 
   editMarker =
-      new google.maps.Marker({position: {lat: lat, lng: lng}, map: map});
+      new google.maps.Marker({position: {lat: latitude, lng: longitude}, map: map});
 
   const infoWindow =
-      new google.maps.InfoWindow({content: buildInfoWindowInput(lat, lng)});
+      new google.maps.InfoWindow({content: buildInfoWindowInput(latitude, longitude)});
 
   // When the user closes the editable info window, remove the marker.
   google.maps.event.addListener(infoWindow, 'closeclick', () => {
@@ -226,14 +226,14 @@ function createMarkerForEdit(lat, lng) {
  * Builds and returns HTML elements that show an editable textbox and a submit
  * button.
  */
-function buildInfoWindowInput(lat, lng) {
+function buildInfoWindowInput(latitude, longitude) {
   const textBox = document.createElement('textarea');
   const button = document.createElement('button');
   button.appendChild(document.createTextNode('Submit'));
 
   button.onclick = () => {
-    postMarker(lat, lng, textBox.value);
-    createMarkerForDisplay(lat, lng, textBox.value);
+    postMarker(latitude, longitude, textBox.value);
+    createMarkerForDisplay(latitude, longitude, textBox.value);
     editMarker.setMap(null);
   };
 
