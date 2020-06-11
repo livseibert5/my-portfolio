@@ -30,6 +30,8 @@ public final class DataService {
 
   private final DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 
+  private final DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+
   public void saveComment(Comment comment) {
     Entity taskEntity = new Entity("Comment");
     taskEntity.setProperty("name", comment.getEmail());
@@ -61,7 +63,7 @@ public final class DataService {
 
     PreparedQuery results = datastore.prepare(query);
     results.asList(FetchOptions.Builder.withDefaults()).stream()
-      .forEach(entity -> datastore.delete(entity.getKey()));
+        .forEach(entity -> datastore.delete(entity.getKey()));
   }
   
   /** Puts markers into Datastore. */
@@ -74,7 +76,7 @@ public final class DataService {
     datastore.put(markerEntity);
   }
 
-/** Fetches markers from Datastore. */
+  /** Fetches markers from Datastore. */
   public List<Marker> getMarkers() {
     Query query = new Query("Marker");
     PreparedQuery results = datastore.prepare(query);
