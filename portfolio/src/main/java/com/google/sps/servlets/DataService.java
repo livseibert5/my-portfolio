@@ -32,7 +32,7 @@ public final class DataService {
 
   public void saveComment(Comment comment) {
     Entity taskEntity = new Entity("Comment");
-    taskEntity.setProperty("name", comment.getName());
+    taskEntity.setProperty("name", comment.getEmail());
     taskEntity.setProperty("timestamp", comment.getTime());
     taskEntity.setProperty("text", comment.getText());
 

@@ -75,9 +75,9 @@ function getComments(value) {
     } else {
       commentsListElement.innerHTML = '';
       comments.forEach((comment) => {
-        const name = comment.name;
+        const email = comment.email;
         const text = comment.text;
-        const element = createCommentElement(name, text);
+        const element = createCommentElement(email, text);
         commentsListElement.appendChild(element);
       })
     }
@@ -100,11 +100,11 @@ function deleteComments() {
  * @param {text} text of comment
  * @return {commentElement} list element to hold comment
  */
-function createCommentElement(name, text) {
+function createCommentElement(email, text) {
   const commentTemplate = document.getElementById('comment-template');
   const commentElement = commentTemplate.content.cloneNode(true);
 
-  commentElement.querySelector(".name").innerText = name;
+  commentElement.querySelector(".email").innerText = email;
   commentElement.querySelector(".text").innerText = text;
 
   return commentElement;

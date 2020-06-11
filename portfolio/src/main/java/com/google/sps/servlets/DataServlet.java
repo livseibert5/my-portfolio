@@ -66,12 +66,12 @@ public class DataServlet extends HttpServlet {
 
     String userEmail = userService.isUserLoggedIn() ? userService.getCurrentUser().getEmail() : "";
 
-    String name = userEmail;
+    String email = userEmail;
     long timestamp = System.currentTimeMillis();
     String text = request.getParameter("comment-text");
 
     DataService dataService = new DataService();
-    Comment comment = new Comment(name, text);
+    Comment comment = new Comment(email, text);
     dataService.saveComment(comment);
 
     response.sendRedirect("/index.html");
