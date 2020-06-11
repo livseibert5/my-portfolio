@@ -34,7 +34,7 @@ public final class MarkerServlet extends HttpServlet {
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
     response.setContentType("application/json");
-
+    
     DataService dataService = new DataService();
     List<Marker> markers = dataService.getMarkers();
     Gson gson = new Gson();
@@ -52,6 +52,6 @@ public final class MarkerServlet extends HttpServlet {
     Marker marker = new Marker(latitude, longitude, content);
 
     DataService dataService = new DataService();
-    dataService.storeMarker(marker);
+    dataService.saveMarker(marker);
   }
 }

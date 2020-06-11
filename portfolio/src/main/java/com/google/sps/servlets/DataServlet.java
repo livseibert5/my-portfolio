@@ -14,6 +14,8 @@
 
 package com.google.sps.servlets;
 
+import com.google.appengine.api.users.UserService;
+import com.google.appengine.api.users.UserServiceFactory;
 import com.google.gson.Gson;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -37,7 +39,6 @@ public class DataServlet extends HttpServlet {
 
     response.setContentType("application/json;");
     response.getWriter().println(json);
-
   }
 
   /**
@@ -61,12 +62,16 @@ public class DataServlet extends HttpServlet {
 
   @Override
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    String name = request.getParameter("name");
+    UserService userService = UserServiceFactory.getUserService();
+
+    String userEmail = userService.isUserLoggedIn() ? userService.getCurrentUser().getEmail() : "";
+
+    String email = userEmail;
     long timestamp = System.currentTimeMillis();
     String text = request.getParameter("comment-text");
 
     DataService dataService = new DataService();
-    Comment comment = new Comment(name, text);
+    Comment comment = new Comment(email, text);
     dataService.saveComment(comment);
 
     response.sendRedirect("/index.html");

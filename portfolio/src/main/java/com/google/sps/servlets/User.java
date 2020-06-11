@@ -14,28 +14,31 @@
 
 package com.google.sps.servlets;
 
-/** Represents a marker on the map. */
-public final class Marker {
+/** 
+  * Represents a user with a login status, redirect URL
+  * and affiliated email address.
+  */
+public final class User {
+  
+  private final String loginStatus;
+  private final String urlDisplay;
+  private final String userEmail;
 
-  private final double latitude;
-  private final double longitude;
-  private final String content;
-
-  public Marker(double latitude, double longitude, String content) {
-    this.latitude = latitude;
-    this.longitude = longitude;
-    this.content = content;
+  public User(String loginStatus, String url, String email) {
+    this.loginStatus = loginStatus;
+    this.urlDisplay = url;
+    this.userEmail = email;
   }
 
-  public double getLatitude() {
-    return latitude;
+  public String getLoginStatus() {
+    return loginStatus;
   }
 
-  public double getLongitude() {
-    return longitude;
+  public String getUrlDisplay() {
+    return urlDisplay;
   }
 
-  public String getContent() {
-    return content;
+  public String getUserEmail() {
+    return userEmail;
   }
 }

@@ -14,28 +14,21 @@
 
 package com.google.sps.servlets;
 
-import com.google.gson.Gson;
-import java.io.IOException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 /** Represents a comment with the user's name, text, and timestamp. */
 public final class Comment {
 
-  private final String name;
+  private final String email;
   private final long timestamp;
   private final String text;
 
-  public Comment(String name, String text) {
+  public Comment(String email, String text) {
     this.timestamp = System.currentTimeMillis();
-    this.name = name;
+    this.email = email;
     this.text = text;
   }
 
-  public String getName() {
-    return name;
+  public String getEmail() {
+    return email;
   }
 
   public long getTime() {

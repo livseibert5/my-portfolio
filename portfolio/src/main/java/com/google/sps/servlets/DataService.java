@@ -26,13 +26,15 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /** Handles all the datastore actions. */
-public class DataService {
+public final class DataService {
+
+  private final DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 
   private final DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 
   public void saveComment(Comment comment) {
     Entity taskEntity = new Entity("Comment");
-    taskEntity.setProperty("name", comment.getName());
+    taskEntity.setProperty("name", comment.getEmail());
     taskEntity.setProperty("timestamp", comment.getTime());
     taskEntity.setProperty("text", comment.getText());
 
@@ -63,12 +65,12 @@ public class DataService {
     results.asList(FetchOptions.Builder.withDefaults()).stream()
         .forEach(entity -> datastore.delete(entity.getKey()));
   }
-
+  
   /** Puts markers into Datastore. */
-  public void storeMarker(Marker marker) {
+  public void saveMarker(Marker marker) {
     Entity markerEntity = new Entity("Marker");
-    markerEntity.setProperty("latitude", marker.getLat());
-    markerEntity.setProperty("longitude", marker.getLng());
+    markerEntity.setProperty("latitude", marker.getLatitude());
+    markerEntity.setProperty("longitude", marker.getLongitude());
     markerEntity.setProperty("content", marker.getContent());
 
     datastore.put(markerEntity);
