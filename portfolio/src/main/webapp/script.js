@@ -30,19 +30,18 @@ document.addEventListener("DOMContentLoaded", userAuth);
 
 function userAuth() {
   const request = new Request('/auth');
-  fetch(request).then(response => response.text()).then((html) => {
-    const parser = new DOMParser();
-    const content = parser.parseFromString(html, 'text/html');
-    const loginBox = document.getElementById('log');
+  fetch(request).then(response => response.json()).then((userInfo) => {
     const welcomeBox = document.getElementById('welcome');
-    welcomeBox.innterHTML = content.getElementById('user').innerHTML;
+    document.getElementById("log").href = userInfo[1];
 
-    if (content.getElementById('login')) {
-      loginBox.innerHTML = content.getElementById('login').innerHTML;
+    if (userInfo[0] === "loggedOut") {
+      welcomeBox.innerText = "Hello user!";
+      document.getElementById("log").innerText = "Login";
       document.getElementById("comments-area").classList.add("hidden");
       sessionStorage.setItem("log", "loggedOut");
     } else {
-      loginBox.innerHTML = content.getElementById('logout').innerHTML;
+      welcomeBox.innerText = "Hello " + userInfo[2] + "!";
+      document.getElementById("log").innerText = "Logout";
       document.getElementById("comments-area").classList.remove("hidden");
       sessionStorage.setItem("log", "loggedIn");
       

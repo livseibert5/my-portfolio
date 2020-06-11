@@ -16,11 +16,14 @@ package com.google.sps.servlets;
 
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
+import com.google.gson.Gson;
 import java.io.IOException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.List;
 
 @WebServlet("/auth")
 public class AuthServlet extends HttpServlet {
@@ -30,20 +33,32 @@ public class AuthServlet extends HttpServlet {
 
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    response.setContentType("text/html");
+    response.setContentType("application/json");
 
     UserService userService = UserServiceFactory.getUserService();
     if (userService.isUserLoggedIn()) {
       String userEmail = userService.getCurrentUser().getEmail();
       String logoutUrl = userService.createLogoutURL(LOGOUT_REDIRECT_URL);
+      
+      List<String> user = new ArrayList<String>();
+      user.add("loggedIn");
+      user.add(logoutUrl);
+      user.add(userEmail);
+      Gson gson = new Gson();
+      String json = gson.toJson(user);
 
-      response.getWriter().println("<p id='user'>Hello " + userEmail + "!</p>");
-      response.getWriter().println("<p id='logout'>Logout <a href=\"" + logoutUrl + "\">here</a>.</p>");
+      response.getWriter().println(json);
+
     } else {
       String loginUrl = userService.createLoginURL(LOGIN_REDIRECT_URL);
+      
+      List<String> user = new ArrayList<String>();
+      user.add("loggedOut");
+      user.add(loginUrl);
+      Gson gson = new Gson();
+      String json = gson.toJson(user);
 
-      response.getWriter().println("<p id='user'>Hello user.</p>");
-      response.getWriter().println("<p id='login'>Login <a href=\"" + loginUrl + "\">here</a>.</p>");
+      response.getWriter().println(json);
     }
   }
 }
