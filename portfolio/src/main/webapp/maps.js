@@ -89,8 +89,8 @@ function initMap() {
     });
   });
 
-  fetch('/auth').then(response => response.json()).then((userInfo) => {
-    if (userInfo[0] === "loggedIn") {
+  fetch('/auth').then(response => response.json()).then((user) => {
+    if (user.loginStatus === "true") {
       document.getElementById("add-marker").classList.remove("hidden");
       map.addListener('click', (event) => {
         createMarkerForEdit(event.latLng.lat(), event.latLng.lng());

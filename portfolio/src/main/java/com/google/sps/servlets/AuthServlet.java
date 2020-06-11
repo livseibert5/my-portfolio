@@ -40,10 +40,7 @@ public class AuthServlet extends HttpServlet {
       String userEmail = userService.getCurrentUser().getEmail();
       String logoutUrl = userService.createLogoutURL(LOGOUT_REDIRECT_URL);
       
-      List<String> user = new ArrayList<String>();
-      user.add("loggedIn");
-      user.add(logoutUrl);
-      user.add(userEmail);
+      User user = new User("true", logoutUrl, userEmail);
       Gson gson = new Gson();
       String json = gson.toJson(user);
 
@@ -52,9 +49,7 @@ public class AuthServlet extends HttpServlet {
     } else {
       String loginUrl = userService.createLoginURL(LOGIN_REDIRECT_URL);
       
-      List<String> user = new ArrayList<String>();
-      user.add("loggedOut");
-      user.add(loginUrl);
+      User user = new User("false", loginUrl, "");
       Gson gson = new Gson();
       String json = gson.toJson(user);
 
