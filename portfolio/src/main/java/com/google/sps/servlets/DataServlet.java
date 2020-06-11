@@ -63,11 +63,8 @@ public class DataServlet extends HttpServlet {
   @Override
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
     UserService userService = UserServiceFactory.getUserService();
-    String userEmail = "";
 
-    if (userService.isUserLoggedIn()) {
-      userEmail = userService.getCurrentUser().getEmail();
-    }
+    String userEmail = userService.isUserLoggedIn() ? userService.getCurrentUser().getEmail() : "";
 
     String name = userEmail;
     long timestamp = System.currentTimeMillis();
