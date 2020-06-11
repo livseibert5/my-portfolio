@@ -36,8 +36,9 @@ public class AuthServlet extends HttpServlet {
     response.setContentType("application/json");
 
     UserService userService = UserServiceFactory.getUserService();
+    String userEmail = userService.isUserLoggedIn() ? userService.getCurrentUser().getEmail() : "";
+
     if (userService.isUserLoggedIn()) {
-      String userEmail = userService.getCurrentUser().getEmail();
       String logoutUrl = userService.createLogoutURL(LOGOUT_REDIRECT_URL);
       
       User user = new User("true", logoutUrl, userEmail);
@@ -49,7 +50,7 @@ public class AuthServlet extends HttpServlet {
     } else {
       String loginUrl = userService.createLoginURL(LOGIN_REDIRECT_URL);
       
-      User user = new User("false", loginUrl, "");
+      User user = new User("false", loginUrl, userEmail);
       Gson gson = new Gson();
       String json = gson.toJson(user);
 
