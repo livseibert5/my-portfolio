@@ -27,11 +27,11 @@ public final class Marker {
     this.content = content;
   }
 
-  public double getLat() {
+  public double getLatitude() {
     return latitude;
   }
 
-  public double getLng() {
+  public double getLongitude() {
     return longitude;
   }
 

@@ -65,10 +65,10 @@ public final class DataService {
   }
   
   /** Puts markers into Datastore. */
-  public void storeMarker(Marker marker) {
+  public void saveMarker(Marker marker) {
     Entity markerEntity = new Entity("Marker");
-    markerEntity.setProperty("lat", marker.getLat());
-    markerEntity.setProperty("lng", marker.getLng());
+    markerEntity.setProperty("latitude", marker.getLatitude());
+    markerEntity.setProperty("longitude", marker.getLongitude());
     markerEntity.setProperty("content", marker.getContent());
 
     datastore.put(markerEntity);

@@ -89,27 +89,36 @@ function initMap() {
     });
   });
 
+  fetch('/auth').then(response => response.json()).then((userInfo) => {
+    if (userInfo[0] === "loggedIn") {
+      document.getElementById("add-marker").classList.remove("hidden");
+      map.addListener('click', (event) => {
+        createMarkerForEdit(event.latLng.lat(), event.latLng.lng());
+      });
+      console.log("running");
+      fetchMarkers();
+    } else {
+      document.getElementById("add-marker").classList.add("hidden");
+    }
+  }).catch(() => {
+      console.error("Bad JSON");
+  });
+
   map.mapTypes.set('styled_map', styledMapType);
   map.setMapTypeId('styled_map');
-
-  if (sessionStorage.getItem("log") === "loggedIn") {
-    document.getElementById("add-marker").classList.remove("hidden");
-    map.addListener('click', (event) => {
-      createMarkerForEdit(event.latLng.lat(), event.latLng.lng());
-    });
-
-    fetchMarkers();
-  } else {
-    document.getElementById("add-marker").classList.add("hidden");
-  }
 }
 
 /** Fetches markers from the backend and adds them to the map. */
 function fetchMarkers() {
   fetch('/markers').then(response => response.json()).then((markers) => {
-    markers.forEach(
-        (marker) => {
-            createMarkerForDisplay(marker.latitude, marker.longitude, marker.content)});
+    if (markers.length != 0) {
+      markers.forEach((marker) => {
+        console.log("making markers");
+        createMarkerForDisplay(marker.latitude, marker.longitude, marker.content);
+      });
+    }
+  }).catch(() => {
+      console.error("Bad Marker data.");
   });
 }
 
@@ -117,7 +126,7 @@ function fetchMarkers() {
 function createMarkerForDisplay(latitude, longitude, content) {
   const marker =
       new google.maps.Marker({position: {lat: latitude, lng: longitude}, map: map});
-
+  console.log("displaying marker");
   const infoWindow = new google.maps.InfoWindow({content: content});
   marker.addListener('click', () => {
     infoWindow.open(map, marker);
