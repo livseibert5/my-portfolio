@@ -30,8 +30,6 @@ public final class DataService {
 
   private final DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 
-  private final DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-
   public void saveComment(Comment comment) {
     Entity taskEntity = new Entity("Comment");
     taskEntity.setProperty("name", comment.getEmail());
