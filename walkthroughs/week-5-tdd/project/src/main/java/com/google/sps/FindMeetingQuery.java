@@ -53,11 +53,11 @@ public final class FindMeetingQuery {
     for (Event event: imptEvents) {
       eventTimes.add(event.getWhen());
     }
+    Collections.sort(eventTimes, TimeRange.ORDER_BY_END);
+    int end = eventTimes.get(eventTimes.size()-1).end();
     Collections.sort(eventTimes, TimeRange.ORDER_BY_START);
-    
     List<TimeRange> freeTimes = new ArrayList<TimeRange>();
     int start = eventTimes.get(0).start();
-    int end = eventTimes.get(eventTimes.size()-1).end();
     freeTimes.add(TimeRange.fromStartEnd(TimeRange.START_OF_DAY, start, false));
     freeTimes.add(TimeRange.fromStartEnd(end, TimeRange.END_OF_DAY, true));
 
