@@ -26,10 +26,17 @@ import java.util.stream.Collectors;
 public final class FindMeetingQuery {
   public Collection<TimeRange> query(Collection<Event> events, MeetingRequest request) {
 
+    boolean onlyOptional = false;
     //see if no attendees were requested or if the requested meeting is too long
     Collection<String> attendeesRequested = request.getAttendees();
     if (attendeesRequested.size() == 0) {
-      return Arrays.asList(TimeRange.WHOLE_DAY);
+      if (request.getOptionalAttendees().size() == 0) {
+        return Arrays.asList(TimeRange.WHOLE_DAY);
+      }
+      else {
+        attendeesRequested = request.getOptionalAttendees();
+        onlyOptional = true;
+      }
     }
     if (request.getDuration() > TimeRange.WHOLE_DAY.duration()) {
       return new ArrayList<TimeRange>();
@@ -37,11 +44,17 @@ public final class FindMeetingQuery {
     
     //see which events our requested attendees are attending
     List<Event> imptEvents = new ArrayList<Event>();
+    List<TimeRange> optionalTimes = new ArrayList<TimeRange>();
     for (Event event: events) {
       Set<String> overlap = new HashSet<String>(attendeesRequested);
       overlap.retainAll(event.getAttendees());
       if (overlap.size() != 0) {
         imptEvents.add(event);
+      }
+      else {
+        if (onlyOptional == false) {
+          optionalTimes.add(event.getWhen());
+        }
       }
     }
 
@@ -90,8 +103,24 @@ public final class FindMeetingQuery {
     //check if the time slots we've found are long enough for requested meeting
     List<TimeRange> longFreeTimes = freeTimes.stream()
         .filter(range -> range.duration() >= request.getDuration()).collect(Collectors.toList());
-    
+
     Collections.sort(longFreeTimes, TimeRange.ORDER_BY_START);
+    
+    //sees if optional attendees can be included
+    List<TimeRange> optionalAttendeesIncluded = new ArrayList<TimeRange>();
+    for (TimeRange time: longFreeTimes) {
+      for (TimeRange optionalTime: optionalTimes) {
+        if (time.contains(optionalTime)) {
+          continue;
+        }
+        optionalAttendeesIncluded.add(time);
+      }
+    }
+    
+    if (optionalAttendeesIncluded.size() != 0) {
+      return optionalAttendeesIncluded;
+    }
+
     return longFreeTimes;
   }
 }
