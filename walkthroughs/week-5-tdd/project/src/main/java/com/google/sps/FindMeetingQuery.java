@@ -14,13 +14,14 @@
 
 package com.google.sps;
 
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public final class FindMeetingQuery {
   public Collection<TimeRange> query(Collection<Event> events, MeetingRequest request) {
@@ -37,46 +38,48 @@ public final class FindMeetingQuery {
     //see which events our requested attendees are attending
     List<Event> imptEvents = new ArrayList<Event>();
     for (Event event: events) {
-      for (String attendee: attendeesRequested) {
-        if (event.getAttendees().contains(attendee)) {
-          imptEvents.add(event);
-        }
+      Set<String> overlap = new HashSet<String>(attendeesRequested);
+      overlap.retainAll(event.getAttendees());
+      if (overlap.size() != 0) {
+        imptEvents.add(event);
       }
     }
 
+    //if none of the requested attendees are busy the meeting can be any time
     if (imptEvents.size() == 0) {
       return Arrays.asList(TimeRange.WHOLE_DAY);
     }
 
-    //put all the time ranges of these events into a set, sort
-    List<TimeRange> eventTimes = new ArrayList<TimeRange>();
-    for (Event event: imptEvents) {
-      eventTimes.add(event.getWhen());
-    }
+    //put all the time ranges of these events into a set
+    List<TimeRange> eventTimes = imptEvents.stream().map(Event::getWhen).collect(Collectors.toList());
+
+    //use first start time and last end time to find free time
     Collections.sort(eventTimes, TimeRange.ORDER_BY_END);
     int end = eventTimes.get(eventTimes.size()-1).end();
     Collections.sort(eventTimes, TimeRange.ORDER_BY_START);
-    List<TimeRange> freeTimes = new ArrayList<TimeRange>();
     int start = eventTimes.get(0).start();
+
+    List<TimeRange> freeTimes = new ArrayList<TimeRange>();
     freeTimes.add(TimeRange.fromStartEnd(TimeRange.START_OF_DAY, start, false));
     freeTimes.add(TimeRange.fromStartEnd(end, TimeRange.END_OF_DAY, true));
 
+    //loop through events to find free time
     for (int i=0; i<eventTimes.size()-1; i++) {
       for (int j=i+1; j<eventTimes.size(); j++) {
         TimeRange range1 = imptEvents.get(i).getWhen();
         TimeRange range2 = imptEvents.get(j).getWhen();
 
-        //if the current meeting contains the next one, compare to the third
+        //if the current meeting contains the next one, compare to the next next
         if (range1.contains(range2)) {
           continue;
         }
 
-        //if current event overlaps next
+        //if current event overlaps next, move to the next outer loop
         else if (range1.overlaps(range2)) {
           break;
         }
 
-        //if neither overlap nor contains
+        //if neither overlap nor contains, we've found free time
         else {
           freeTimes.add(TimeRange.fromStartEnd(range1.end(), range2.start(), false));
           break;
@@ -84,12 +87,9 @@ public final class FindMeetingQuery {
       }
     }
     
-    List<TimeRange> longFreeTimes = new ArrayList<TimeRange>();
-    for (TimeRange time: freeTimes) {
-      if (time.duration() >= request.getDuration()-1) {
-        longFreeTimes.add(time);
-      }
-    }
+    //check if the time slots we've found are long enough for requested meeting
+    List<TimeRange> longFreeTimes = freeTimes.stream()
+        .filter(range -> range.duration() >= request.getDuration()).collect(Collectors.toList());
     
     Collections.sort(longFreeTimes, TimeRange.ORDER_BY_START);
     return longFreeTimes;
