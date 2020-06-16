@@ -97,8 +97,8 @@ public final class FindMeetingQuery {
     freeTimes.add(TimeRange.fromStartEnd(end, TimeRange.END_OF_DAY, true));
 
     // Loop through events to find free time
-    for (int i=0; i<eventTimes.size()-1; i++) {
-      for (int j=i+1; j<eventTimes.size(); j++) {
+    for (int i = 0; i < eventTimes.size()-1; i++) {
+      for (int j = i+1; j < eventTimes.size(); j++) {
         TimeRange range1 = eventTimes.get(i);
         TimeRange range2 = eventTimes.get(j);
 
