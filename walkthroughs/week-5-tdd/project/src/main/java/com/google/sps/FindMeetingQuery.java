@@ -59,15 +59,27 @@ public final class FindMeetingQuery {
     Collections.sort(eventTimes, TimeRange.ORDER_BY_START);
     int start = eventTimes.get(0).start();
 
+    List<TimeRange> freeTimes = findFreeTime(start, end, eventTimes);
+    
+    // Check if the time slots we've found are long enough for requested meeting
+    List<TimeRange> longFreeTimes = freeTimes.stream()
+        .filter(range -> range.duration() >= request.getDuration()).collect(Collectors.toList());
+    
+    Collections.sort(longFreeTimes, TimeRange.ORDER_BY_START);
+    return longFreeTimes;
+  }
+
+  public static List<TimeRange> findFreeTime(int start, int end, List<TimeRange> eventTimes) {
     List<TimeRange> freeTimes = new ArrayList<TimeRange>();
     freeTimes.add(TimeRange.fromStartEnd(TimeRange.START_OF_DAY, start, false));
     freeTimes.add(TimeRange.fromStartEnd(end, TimeRange.END_OF_DAY, true));
 
+
     // Loop through events to find free time
     for (int i = 0; i < eventTimes.size()-1; i++) {
       for (int j = i+1; j < eventTimes.size(); j++) {
-        TimeRange range1 = importantEvents.get(i).getWhen();
-        TimeRange range2 = importantEvents.get(j).getWhen();
+        TimeRange range1 = eventTimes.get(i);
+        TimeRange range2 = eventTimes.get(j);
 
         // If the current meeting contains the next one, compare to the next next
         if (range1.contains(range2)) {
@@ -86,12 +98,7 @@ public final class FindMeetingQuery {
         }
       }
     }
-    
-    // Check if the time slots we've found are long enough for requested meeting
-    List<TimeRange> longFreeTimes = freeTimes.stream()
-        .filter(range -> range.duration() >= request.getDuration()).collect(Collectors.toList());
-    
-    Collections.sort(longFreeTimes, TimeRange.ORDER_BY_START);
-    return longFreeTimes;
+
+    return freeTimes;
   }
 }
