@@ -36,14 +36,7 @@ public final class FindMeetingQuery {
     }
     
     // See which events our requested attendees are attending
-    List<Event> importantEvents = new ArrayList<Event>();
-    for (Event event: events) {
-      Set<String> overlap = new HashSet<String>(attendeesRequested);
-      overlap.retainAll(event.getAttendees());
-      if (!overlap.isEmpty()) {
-        importantEvents.add(event);
-      }
-    }
+    List<Event> importantEvents = findImportantEvents(events, attendeesRequested);
 
     // If none of the requested attendees are busy the meeting can be any time
     if (importantEvents.isEmpty()) {
@@ -69,6 +62,7 @@ public final class FindMeetingQuery {
     return longFreeTimes;
   }
 
+  /** Loops through list of event times and finds free time between them. */
   public static List<TimeRange> findFreeTime(int start, int end, List<TimeRange> eventTimes) {
     List<TimeRange> freeTimes = new ArrayList<TimeRange>();
     freeTimes.add(TimeRange.fromStartEnd(TimeRange.START_OF_DAY, start, false));
@@ -100,5 +94,18 @@ public final class FindMeetingQuery {
     }
 
     return freeTimes;
+  }
+
+  /** Find events in event list that the request attendees are attending. */
+  public static List<Event> findImportantEvents(Collection<Event> events, Collection<String> attendeesRequested) {
+    List<Event> importantEvents = new ArrayList<Event>();
+    for (Event event: events) {
+      Set<String> overlap = new HashSet<String>(attendeesRequested);
+      overlap.retainAll(event.getAttendees());
+      if (!overlap.isEmpty()) {
+        importantEvents.add(event);
+      }
+    }
+    return importantEvents;
   }
 }
