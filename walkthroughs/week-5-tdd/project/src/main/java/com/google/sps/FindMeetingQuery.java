@@ -27,9 +27,9 @@ public final class FindMeetingQuery {
   public Collection<TimeRange> query(Collection<Event> events, MeetingRequest request) {
 
     boolean onlyOptional = false;
-    //see if no attendees were requested or if the requested meeting is too long
+    // See if no attendees were requested or if the requested meeting is too long
     Collection<String> attendeesRequested = request.getAttendees();
-    if (attendeesRequested.size() == 0) {
+    if (attendeesRequested.isEmpty()) {
       if (request.getOptionalAttendees().size() == 0) {
         return Arrays.asList(TimeRange.WHOLE_DAY);
       }
@@ -42,14 +42,14 @@ public final class FindMeetingQuery {
       return new ArrayList<TimeRange>();
     }
     
-    //see which events our requested attendees are attending
-    List<Event> imptEvents = new ArrayList<Event>();
+    // See which events our requested attendees are attending
+    List<Event> importantEvents = new ArrayList<Event>();
     List<TimeRange> optionalTimes = new ArrayList<TimeRange>();
     for (Event event: events) {
       Set<String> overlap = new HashSet<String>(attendeesRequested);
       overlap.retainAll(event.getAttendees());
-      if (overlap.size() != 0) {
-        imptEvents.add(event);
+      if (!overlap.isEmpty()) {
+        importantEvents.add(event);
       }
       else {
         if (onlyOptional == false) {
@@ -58,55 +58,72 @@ public final class FindMeetingQuery {
       }
     }
 
-    //if none of the requested attendees are busy the meeting can be any time
-    if (imptEvents.size() == 0) {
+    // If none of the requested attendees are busy the meeting can be any time
+    if (importantEvents.isEmpty()) {
       return Arrays.asList(TimeRange.WHOLE_DAY);
     }
 
-    //put all the time ranges of these events into a set
-    List<TimeRange> eventTimes = imptEvents.stream().map(Event::getWhen).collect(Collectors.toList());
+    // Put all the time ranges of these events into a set
+    List<TimeRange> eventTimes = importantEvents.stream().map(Event::getWhen).collect(Collectors.toList());
 
-    //use first start time and last end time to find free time
+    // Use first start time and last end time to find free time
     Collections.sort(eventTimes, TimeRange.ORDER_BY_END);
     int end = eventTimes.get(eventTimes.size()-1).end();
     Collections.sort(eventTimes, TimeRange.ORDER_BY_START);
     int start = eventTimes.get(0).start();
 
+    List<TimeRange> freeTimes = findFreeTime(start, end, eventTimes);
+    
+    // Check if the time slots we've found are long enough for requested meeting
+    List<TimeRange> longFreeTimes = freeTimes.stream()
+        .filter(range -> range.duration() >= request.getDuration()).collect(Collectors.toList());
+
+    Collections.sort(longFreeTimes, TimeRange.ORDER_BY_START);
+    
+    // Sees if optional attendees can be included
+    List<TimeRange> optionalAttendeesIncluded = checkOptionalAttendees(longFreeTimes, optionalTimes);
+    
+    if (!optionalAttendeesIncluded.isEmpty()) {
+      return optionalAttendeesIncluded;
+    }
+
+    return longFreeTimes;
+  }
+
+  /** Find free times from a list of events the attendees are attending */
+  public static List<TimeRange> findFreeTime(int start, int end, List<TimeRange> eventTimes) {
     List<TimeRange> freeTimes = new ArrayList<TimeRange>();
     freeTimes.add(TimeRange.fromStartEnd(TimeRange.START_OF_DAY, start, false));
     freeTimes.add(TimeRange.fromStartEnd(end, TimeRange.END_OF_DAY, true));
 
-    //loop through events to find free time
+    // Loop through events to find free time
     for (int i=0; i<eventTimes.size()-1; i++) {
       for (int j=i+1; j<eventTimes.size(); j++) {
-        TimeRange range1 = imptEvents.get(i).getWhen();
-        TimeRange range2 = imptEvents.get(j).getWhen();
+        TimeRange range1 = eventTimes.get(i);
+        TimeRange range2 = eventTimes.get(j);
 
-        //if the current meeting contains the next one, compare to the next next
+        // If the current meeting contains the next one, compare to the next next
         if (range1.contains(range2)) {
           continue;
         }
 
-        //if current event overlaps next, move to the next outer loop
+        // If current event overlaps next, move to the next outer loop
         else if (range1.overlaps(range2)) {
           break;
         }
 
-        //if neither overlap nor contains, we've found free time
+        // If neither overlap nor contains, we've found free time
         else {
           freeTimes.add(TimeRange.fromStartEnd(range1.end(), range2.start(), false));
           break;
         }
       }
     }
-    
-    //check if the time slots we've found are long enough for requested meeting
-    List<TimeRange> longFreeTimes = freeTimes.stream()
-        .filter(range -> range.duration() >= request.getDuration()).collect(Collectors.toList());
+    return freeTimes;
+  }
 
-    Collections.sort(longFreeTimes, TimeRange.ORDER_BY_START);
-    
-    //sees if optional attendees can be included
+  /** Checks if optional attendees can be included in meeting time */
+  public static List<TimeRange> checkOptionalAttendees(List<TimeRange> longFreeTimes, List<TimeRange> optionalTimes) {
     List<TimeRange> optionalAttendeesIncluded = new ArrayList<TimeRange>();
     for (TimeRange time: longFreeTimes) {
       for (TimeRange optionalTime: optionalTimes) {
@@ -116,11 +133,6 @@ public final class FindMeetingQuery {
         optionalAttendeesIncluded.add(time);
       }
     }
-    
-    if (optionalAttendeesIncluded.size() != 0) {
-      return optionalAttendeesIncluded;
-    }
-
-    return longFreeTimes;
+    return optionalAttendeesIncluded;
   }
 }
