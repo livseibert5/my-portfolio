@@ -63,7 +63,7 @@ public final class FindMeetingQuery {
   }
 
   /** Loops through list of event times and finds free time between them. */
-  public static List<TimeRange> findFreeTime(int start, int end, List<TimeRange> eventTimes) {
+  private static List<TimeRange> findFreeTime(int start, int end, List<TimeRange> eventTimes) {
     List<TimeRange> freeTimes = new ArrayList<TimeRange>();
     freeTimes.add(TimeRange.fromStartEnd(TimeRange.START_OF_DAY, start, false));
     freeTimes.add(TimeRange.fromStartEnd(end, TimeRange.END_OF_DAY, true));
