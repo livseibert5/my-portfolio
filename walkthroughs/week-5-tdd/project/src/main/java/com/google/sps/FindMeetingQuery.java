@@ -97,7 +97,7 @@ public final class FindMeetingQuery {
   }
 
   /** Find events in event list that the request attendees are attending. */
-  public static List<Event> findImportantEvents(Collection<Event> events, Collection<String> attendeesRequested) {
+  private static List<Event> findImportantEvents(Collection<Event> events, Collection<String> attendeesRequested) {
     List<Event> importantEvents = new ArrayList<Event>();
     for (Event event: events) {
       Set<String> overlap = new HashSet<String>(attendeesRequested);
