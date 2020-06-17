@@ -91,7 +91,7 @@ public final class FindMeetingQuery {
   }
 
   /** Find free times from a list of events the attendees are attending */
-  public static List<TimeRange> findFreeTime(int start, int end, List<TimeRange> eventTimes) {
+  private static List<TimeRange> findFreeTime(int start, int end, List<TimeRange> eventTimes) {
     List<TimeRange> freeTimes = new ArrayList<TimeRange>();
     freeTimes.add(TimeRange.fromStartEnd(TimeRange.START_OF_DAY, start, false));
     freeTimes.add(TimeRange.fromStartEnd(end, TimeRange.END_OF_DAY, true));
@@ -123,7 +123,7 @@ public final class FindMeetingQuery {
   }
 
   /** Checks if optional attendees can be included in meeting time */
-  public static List<TimeRange> checkOptionalAttendees(List<TimeRange> longFreeTimes, List<TimeRange> optionalTimes) {
+  private static List<TimeRange> checkOptionalAttendees(List<TimeRange> longFreeTimes, List<TimeRange> optionalTimes) {
     List<TimeRange> optionalAttendeesIncluded = new ArrayList<TimeRange>();
     for (TimeRange time: longFreeTimes) {
       for (TimeRange optionalTime: optionalTimes) {
