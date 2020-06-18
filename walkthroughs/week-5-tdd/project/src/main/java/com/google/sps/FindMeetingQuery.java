@@ -29,6 +29,7 @@ public final class FindMeetingQuery {
   public Collection<TimeRange> query(Collection<Event> events, MeetingRequest request) {
   
     boolean onlyOptional = false;
+
     // See if no attendees were requested or if the requested meeting is too long
     Collection<String> attendeesRequested = request.getAttendees();
     if (attendeesRequested.isEmpty()) {
@@ -40,10 +41,12 @@ public final class FindMeetingQuery {
         onlyOptional = true;
       }
     }
+
     if (request.getDuration() > TimeRange.WHOLE_DAY.duration()) {
       return new ArrayList<TimeRange>();
     }
     
+    // Makes a map where keys are optional attendees and values are lists of their free times
     Map<String, List<Event>> optionalAttendeeTimes = new HashMap<String, List<Event>>();
     Map<String, List<TimeRange>> optionalTimeFree = new HashMap<String, List<TimeRange>>();
 
@@ -61,6 +64,7 @@ public final class FindMeetingQuery {
       if (!overlap.isEmpty()) {
         importantEvents.add(event);
       }
+      
       else {
         if (onlyOptional == false) {
           optionalTimes.add(event.getWhen());
@@ -90,36 +94,9 @@ public final class FindMeetingQuery {
 
     Collections.sort(longFreeTimes, TimeRange.ORDER_BY_START);
 
-    Map<TimeRange, Integer> finalTimes = new HashMap<TimeRange, Integer>();
-    TimeRange bestTime = TimeRange.WHOLE_DAY;
     if (!optionalTimeFree.isEmpty()) {
-      for (String attendee: optionalTimeFree.keySet()) {
-        List<TimeRange> optionalTimesFinal = optionalTimeFree.get(attendee);
-        for (TimeRange optionalTime: optionalTimesFinal) {
-          for (TimeRange time: longFreeTimes) {
-            if (optionalTime.contains(time)) {
-              if (!finalTimes.containsKey(time)) {
-                finalTimes.put(time, new Integer(1));
-              }
-              else {
-                finalTimes.put(time, new Integer(finalTimes.get(time)+1));
-              }
-            }
-          }
-        }
-      }
-    
-      int max = 0;
-      for (TimeRange time: finalTimes.keySet()) {
-        int frequency = finalTimes.get(time).intValue();
-        if (frequency > max) {
-          System.out.println("hey");
-          max = frequency;
-          bestTime = time;
-        }
-      }
-
-      return Arrays.asList(bestTime);
+      Map<TimeRange, Integer> finalTimes = getTimeRangeFrequency(optionalTimeFree, longFreeTimes);
+      return Arrays.asList(getBestTime(finalTimes));
     }
 
     List<TimeRange> optionalAttendeesIncluded = checkOptionalAttendees(longFreeTimes, optionalTimes);
@@ -132,7 +109,7 @@ public final class FindMeetingQuery {
   }
 
   /** Find free times from a list of events the attendees are attending */
-  public static List<TimeRange> findFreeTime(int start, int end, List<TimeRange> eventTimes) {
+  private static List<TimeRange> findFreeTime(int start, int end, List<TimeRange> eventTimes) {
     List<TimeRange> freeTimes = new ArrayList<TimeRange>();
     freeTimes.add(TimeRange.fromStartEnd(TimeRange.START_OF_DAY, start, false));
     freeTimes.add(TimeRange.fromStartEnd(end, TimeRange.END_OF_DAY, true));
@@ -177,25 +154,22 @@ public final class FindMeetingQuery {
     return optionalAttendeesIncluded;
   }
 
-  public static Map<String, List<Event>> getOptionalAttendeeMap(Collection<Event> events, MeetingRequest request) {
+  /** Creates a HashMap of optional attendees and the events they're scheduled for */
+  private static Map<String, List<Event>> getOptionalAttendeeMap(Collection<Event> events, MeetingRequest request) {
     Map<String, List<Event>> optionalAttendeeTimes = new HashMap<String, List<Event>>();
     for (String attendee: request.getOptionalAttendees()) {
       for (Event event: events) {
         if (event.getAttendees().contains(attendee)) {
-          if (!optionalAttendeeTimes.containsKey(attendee)) {
-            optionalAttendeeTimes.put(attendee, new ArrayList<Event>());
-            optionalAttendeeTimes.get(attendee).add(event);
-          }
-          else {
-            optionalAttendeeTimes.get(attendee).add(event);
-          }
+          optionalAttendeeTimes.putIfAbsent(attendee, new ArrayList<Event>());
+          optionalAttendeeTimes.get(attendee).add(event);
         }
       }
     }
     return optionalAttendeeTimes;
   }
-
-  public static Map<String, List<TimeRange>> getOptionalAttendeeFreeTime(Map<String, List<Event>> optionalAttendeeTimes) {
+  
+  /** Creates a HashMap of optional attendees and the free time they have */
+  private static Map<String, List<TimeRange>> getOptionalAttendeeFreeTime(Map<String, List<Event>> optionalAttendeeTimes) {
     Map<String, List<TimeRange>> optionalTimeFree = new HashMap<String, List<TimeRange>>();
     for (String attendee: optionalAttendeeTimes.keySet()) {
       List<TimeRange> optionalTimes = optionalAttendeeTimes.get(attendee).stream().map(Event::getWhen).collect(Collectors.toList());
@@ -208,5 +182,35 @@ public final class FindMeetingQuery {
       optionalTimeFree.put(attendee, freeTimes);
     }
     return optionalTimeFree;
+  }
+
+  /** Given a map of the frequency of time ranges, return the time range with the greatest frequency */
+  private static TimeRange getBestTime(Map<TimeRange, Integer> finalTimes) {
+    int max = 0;
+    TimeRange bestTime = TimeRange.WHOLE_DAY;
+    for (TimeRange time: finalTimes.keySet()) {
+        int frequency = finalTimes.get(time).intValue();
+        if (frequency > max) {
+          max = frequency;
+          bestTime = time;
+        }
+    }
+    return bestTime;
+  }
+
+  /** Create a map with time ranges as keys and frequency of the time range as values */
+  private static Map<TimeRange, Integer> getTimeRangeFrequency(Map<String, List<TimeRange>> optionalTimeFree, List<TimeRange> longFreeTimes) {
+    Map<TimeRange, Integer> finalTimes = new HashMap<TimeRange, Integer>();
+    for (String attendee: optionalTimeFree.keySet()) {
+        for (TimeRange optionalTime: optionalTimeFree.get(attendee)) {
+          for (TimeRange time: longFreeTimes) {
+            if (optionalTime.contains(time)) {
+              finalTimes.putIfAbsent(time, new Integer(0));
+              finalTimes.put(time, new Integer(finalTimes.get(time)+1));
+            }
+          }
+        }
+    }
+    return finalTimes;
   }
 }
