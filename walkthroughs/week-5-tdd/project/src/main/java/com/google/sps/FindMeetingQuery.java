@@ -93,11 +93,11 @@ public final class FindMeetingQuery {
     Map<TimeRange, Integer> finalTimes = new HashMap<TimeRange, Integer>();
     TimeRange bestTime = TimeRange.WHOLE_DAY;
     if (!optionalTimeFree.isEmpty()) {
-      for (TimeRange time: freeTimeSet) {
-        for (String attendee: optionalTimeFree.keySet()) {
-          List<TimeRange> optionalTimesFinal = optionalTimeFree.get(attendee);
-          for (TimeRange optionalTime: optionalTimesFinal) {
-            if (time.contains(optionalTime)) {
+      for (String attendee: optionalTimeFree.keySet()) {
+        List<TimeRange> optionalTimesFinal = optionalTimeFree.get(attendee);
+        for (TimeRange optionalTime: optionalTimesFinal) {
+          for (TimeRange time: longFreeTimes) {
+            if (optionalTime.contains(time)) {
               if (!finalTimes.containsKey(time)) {
                 finalTimes.put(time, new Integer(1));
               }
@@ -113,6 +113,7 @@ public final class FindMeetingQuery {
       for (TimeRange time: finalTimes.keySet()) {
         int frequency = finalTimes.get(time).intValue();
         if (frequency > max) {
+          System.out.println("hey");
           max = frequency;
           bestTime = time;
         }
