@@ -27,10 +27,7 @@ import java.util.stream.Collectors;
 
 public final class FindMeetingQuery {
   public Collection<TimeRange> query(Collection<Event> events, MeetingRequest request) {
-
-    Map<String, List<Event>> optionalAttendeeTimes = getOptionalAttendeeMap(events, request);
-    Map<String, List<TimeRange>> optionalTimeFree = getOptionalAttendeeFreeTime(optionalAttendeeTimes);
-
+  
     boolean onlyOptional = false;
     // See if no attendees were requested or if the requested meeting is too long
     Collection<String> attendeesRequested = request.getAttendees();
@@ -47,6 +44,14 @@ public final class FindMeetingQuery {
       return new ArrayList<TimeRange>();
     }
     
+    Map<String, List<Event>> optionalAttendeeTimes = new HashMap<String, List<Event>>();
+    Map<String, List<TimeRange>> optionalTimeFree = new HashMap<String, List<TimeRange>>();
+
+    if (onlyOptional == false && request.getOptionalAttendees().size() > 1) {
+      optionalAttendeeTimes = getOptionalAttendeeMap(events, request);
+      optionalTimeFree = getOptionalAttendeeFreeTime(optionalAttendeeTimes);
+    }
+   
     // See which events our requested attendees are attending
     List<Event> importantEvents = new ArrayList<Event>();
     List<TimeRange> optionalTimes = new ArrayList<TimeRange>();
@@ -86,33 +91,43 @@ public final class FindMeetingQuery {
     Collections.sort(longFreeTimes, TimeRange.ORDER_BY_START);
 
     Map<TimeRange, Integer> finalTimes = new HashMap<TimeRange, Integer>();
-    for (TimeRange time: longFreeTimes) {
-      for (String attendee: optionalTimeFree.keySet()) {
-        List<TimeRange> optionalTimesFinal = optionalTimeFree.get(attendee);
-        for (TimeRange optionalTime: optionalTimesFinal) {
-          if (time.contains(optionalTime)) {
-            if (!finalTimes.containsKey(time)) {
-              finalTimes.put(time, new Integer(1));
-            }
-            else {
-              finalTimes.put(time, new Integer(finalTimes.get(time)+1));
+    TimeRange bestTime = TimeRange.WHOLE_DAY;
+    if (!optionalTimeFree.isEmpty()) {
+      for (TimeRange time: freeTimeSet) {
+        for (String attendee: optionalTimeFree.keySet()) {
+          List<TimeRange> optionalTimesFinal = optionalTimeFree.get(attendee);
+          for (TimeRange optionalTime: optionalTimesFinal) {
+            if (time.contains(optionalTime)) {
+              if (!finalTimes.containsKey(time)) {
+                finalTimes.put(time, new Integer(1));
+              }
+              else {
+                finalTimes.put(time, new Integer(finalTimes.get(time)+1));
+              }
             }
           }
         }
       }
-    }
     
-    TimeRange bestTime = TimeRange.WHOLE_DAY;
-    int max = 0;
-    for (TimeRange time: finalTimes.keySet()) {
-      int frequency = finalTimes.get(time).intValue();
-      if (frequency > max) {
-        max = frequency;
-        bestTime = time;
+      int max = 0;
+      for (TimeRange time: finalTimes.keySet()) {
+        int frequency = finalTimes.get(time).intValue();
+        if (frequency > max) {
+          max = frequency;
+          bestTime = time;
+        }
       }
+
+      return Arrays.asList(bestTime);
     }
 
-    return Arrays.asList(bestTime);
+    List<TimeRange> optionalAttendeesIncluded = checkOptionalAttendees(longFreeTimes, optionalTimes);
+
+    if (!optionalAttendeesIncluded.isEmpty()) {
+      return optionalAttendeesIncluded;
+    }
+
+    return longFreeTimes;
   }
 
   /** Find free times from a list of events the attendees are attending */
@@ -167,7 +182,8 @@ public final class FindMeetingQuery {
       for (Event event: events) {
         if (event.getAttendees().contains(attendee)) {
           if (!optionalAttendeeTimes.containsKey(attendee)) {
-            optionalAttendeeTimes.put(attendee, Arrays.asList(event));
+            optionalAttendeeTimes.put(attendee, new ArrayList<Event>());
+            optionalAttendeeTimes.get(attendee).add(event);
           }
           else {
             optionalAttendeeTimes.get(attendee).add(event);
@@ -181,7 +197,7 @@ public final class FindMeetingQuery {
   public static Map<String, List<TimeRange>> getOptionalAttendeeFreeTime(Map<String, List<Event>> optionalAttendeeTimes) {
     Map<String, List<TimeRange>> optionalTimeFree = new HashMap<String, List<TimeRange>>();
     for (String attendee: optionalAttendeeTimes.keySet()) {
-    List<TimeRange> optionalTimes = optionalAttendeeTimes.get(attendee).stream().map(Event::getWhen).collect(Collectors.toList());
+      List<TimeRange> optionalTimes = optionalAttendeeTimes.get(attendee).stream().map(Event::getWhen).collect(Collectors.toList());
       Collections.sort(optionalTimes, TimeRange.ORDER_BY_END);
       int end = optionalTimes.get(optionalTimes.size()-1).end();
       Collections.sort(optionalTimes, TimeRange.ORDER_BY_START);
