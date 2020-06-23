@@ -202,14 +202,14 @@ public final class FindMeetingQuery {
   private static Map<TimeRange, Integer> getTimeRangeFrequency(Map<String, List<TimeRange>> optionalTimeFree, List<TimeRange> longFreeTimes) {
     Map<TimeRange, Integer> finalTimes = new HashMap<TimeRange, Integer>();
     for (String attendee: optionalTimeFree.keySet()) {
-        for (TimeRange optionalTime: optionalTimeFree.get(attendee)) {
-          for (TimeRange time: longFreeTimes) {
-            if (optionalTime.contains(time)) {
-              finalTimes.putIfAbsent(time, new Integer(0));
-              finalTimes.put(time, new Integer(finalTimes.get(time)+1));
-            }
+      for (TimeRange optionalTime: optionalTimeFree.get(attendee)) {
+        for (TimeRange time: longFreeTimes) {
+          if (optionalTime.contains(time)) {
+            finalTimes.putIfAbsent(time, new Integer(0));
+            finalTimes.put(time, new Integer(finalTimes.get(time)+1));
           }
         }
+      }
     }
     return finalTimes;
   }
