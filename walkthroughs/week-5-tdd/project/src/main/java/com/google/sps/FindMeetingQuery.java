@@ -26,17 +26,37 @@ import java.util.stream.Collectors;
 public final class FindMeetingQuery {
   public static Collection<TimeRange> query(Collection<Event> events, MeetingRequest request) {
 
+    boolean onlyOptional = false;
     // See if no attendees were requested or if the requested meeting is too long
     Collection<String> attendeesRequested = request.getAttendees();
     if (attendeesRequested.isEmpty()) {
-      return Arrays.asList(TimeRange.WHOLE_DAY);
+      if (request.getOptionalAttendees().size() == 0) {
+        return Arrays.asList(TimeRange.WHOLE_DAY);
+      }
+      else {
+        attendeesRequested = request.getOptionalAttendees();
+        onlyOptional = true;
+      }
     }
     if (request.getDuration() > TimeRange.WHOLE_DAY.duration()) {
       return new ArrayList<TimeRange>();
     }
     
     // See which events our requested attendees are attending
-    List<Event> importantEvents = findImportantEvents(events, attendeesRequested);
+    List<Event> importantEvents = new ArrayList<Event>();
+    List<TimeRange> optionalTimes = new ArrayList<TimeRange>();
+    for (Event event: events) {
+      Set<String> overlap = new HashSet<String>(attendeesRequested);
+      overlap.retainAll(event.getAttendees());
+      if (!overlap.isEmpty()) {
+        importantEvents.add(event);
+      }
+      else {
+        if (onlyOptional == false) {
+          optionalTimes.add(event.getWhen());
+        }
+      }
+    }
 
     // If none of the requested attendees are busy the meeting can be any time
     if (importantEvents.isEmpty()) {
@@ -57,24 +77,31 @@ public final class FindMeetingQuery {
     // Check if the time slots we've found are long enough for requested meeting
     List<TimeRange> longFreeTimes = freeTimes.stream()
         .filter(range -> range.duration() >= request.getDuration()).collect(Collectors.toList());
-    
+
     Collections.sort(longFreeTimes, TimeRange.ORDER_BY_START);
+    
+    // Sees if optional attendees can be included
+    List<TimeRange> optionalAttendeesIncluded = checkOptionalAttendees(longFreeTimes, optionalTimes);
+    
+    if (!optionalAttendeesIncluded.isEmpty()) {
+      return optionalAttendeesIncluded;
+    }
+
     return longFreeTimes;
   }
 
-  /** Loops through list of event times and finds free time between them. */
+  /** Find free times from a list of events the attendees are attending */
   private static List<TimeRange> findFreeTime(int start, int end, List<TimeRange> eventTimes) {
     List<TimeRange> freeTimes = new ArrayList<TimeRange>();
     freeTimes.add(TimeRange.fromStartEnd(TimeRange.START_OF_DAY, start, false));
     freeTimes.add(TimeRange.fromStartEnd(end, TimeRange.END_OF_DAY, true));
-
 
     // Loop through events to find free time
     for (int i = 0; i < eventTimes.size()-1; i++) {
       for (int j = i+1; j < eventTimes.size(); j++) {
         TimeRange range1 = eventTimes.get(i);
         TimeRange range2 = eventTimes.get(j);
-
+        
         // If the current meeting contains the next one, compare to the next next
         if (range1.contains(range2)) {
           continue;
@@ -92,20 +119,20 @@ public final class FindMeetingQuery {
         }
       }
     }
-
     return freeTimes;
   }
 
-  /** Find events in event list that the request attendees are attending. */
-  private static List<Event> findImportantEvents(Collection<Event> events, Collection<String> attendeesRequested) {
-    List<Event> importantEvents = new ArrayList<Event>();
-    for (Event event: events) {
-      Set<String> overlap = new HashSet<String>(attendeesRequested);
-      overlap.retainAll(event.getAttendees());
-      if (!overlap.isEmpty()) {
-        importantEvents.add(event);
+  /** Checks if optional attendees can be included in meeting time */
+  private static List<TimeRange> checkOptionalAttendees(List<TimeRange> longFreeTimes, List<TimeRange> optionalTimes) {
+    List<TimeRange> optionalAttendeesIncluded = new ArrayList<TimeRange>();
+    for (TimeRange time: longFreeTimes) {
+      for (TimeRange optionalTime: optionalTimes) {
+        if (time.contains(optionalTime)) {
+          continue;
+        }
+        optionalAttendeesIncluded.add(time);
       }
     }
-    return importantEvents;
+    return optionalAttendeesIncluded;
   }
 }
