@@ -18,8 +18,10 @@ import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -27,6 +29,7 @@ public final class FindMeetingQuery {
   public static Collection<TimeRange> query(Collection<Event> events, MeetingRequest request) {
 
     boolean onlyOptional = false;
+
     // See if no attendees were requested or if the requested meeting is too long
     Collection<String> attendeesRequested = request.getAttendees();
     if (attendeesRequested.isEmpty()) {
@@ -38,10 +41,20 @@ public final class FindMeetingQuery {
         onlyOptional = true;
       }
     }
+
     if (request.getDuration() > TimeRange.WHOLE_DAY.duration()) {
       return new ArrayList<TimeRange>();
     }
     
+    // Makes a map where keys are optional attendees and values are lists of their free times
+    Map<String, List<Event>> optionalAttendeeTimes = new HashMap<String, List<Event>>();
+    Map<String, List<TimeRange>> optionalTimeFree = new HashMap<String, List<TimeRange>>();
+
+    if (onlyOptional == false && request.getOptionalAttendees().size() > 1) {
+      optionalAttendeeTimes = getOptionalAttendeeMap(events, request);
+      optionalTimeFree = getOptionalAttendeeFreeTime(optionalAttendeeTimes);
+    }
+   
     // See which events our requested attendees are attending
     List<Event> importantEvents = new ArrayList<Event>();
     List<TimeRange> optionalTimes = new ArrayList<TimeRange>();
@@ -51,6 +64,7 @@ public final class FindMeetingQuery {
       if (!overlap.isEmpty()) {
         importantEvents.add(event);
       }
+      
       else {
         if (onlyOptional == false) {
           optionalTimes.add(event.getWhen());
@@ -79,10 +93,14 @@ public final class FindMeetingQuery {
         .filter(range -> range.duration() >= request.getDuration()).collect(Collectors.toList());
 
     Collections.sort(longFreeTimes, TimeRange.ORDER_BY_START);
-    
-    // Sees if optional attendees can be included
+
+    if (!optionalTimeFree.isEmpty()) {
+      Map<TimeRange, Integer> finalTimes = getTimeRangeFrequency(optionalTimeFree, longFreeTimes);
+      return Arrays.asList(getBestTime(finalTimes));
+    }
+
     List<TimeRange> optionalAttendeesIncluded = checkOptionalAttendees(longFreeTimes, optionalTimes);
-    
+
     if (!optionalAttendeesIncluded.isEmpty()) {
       return optionalAttendeesIncluded;
     }
@@ -134,5 +152,65 @@ public final class FindMeetingQuery {
       }
     }
     return optionalAttendeesIncluded;
+  }
+
+  /** Creates a HashMap of optional attendees and the events they're scheduled for */
+  private static Map<String, List<Event>> getOptionalAttendeeMap(Collection<Event> events, MeetingRequest request) {
+    Map<String, List<Event>> optionalAttendeeTimes = new HashMap<String, List<Event>>();
+    for (String attendee: request.getOptionalAttendees()) {
+      for (Event event: events) {
+        if (event.getAttendees().contains(attendee)) {
+          optionalAttendeeTimes.putIfAbsent(attendee, new ArrayList<Event>());
+          optionalAttendeeTimes.get(attendee).add(event);
+        }
+      }
+    }
+    return optionalAttendeeTimes;
+  }
+  
+  /** Creates a HashMap of optional attendees and the free time they have */
+  private static Map<String, List<TimeRange>> getOptionalAttendeeFreeTime(Map<String, List<Event>> optionalAttendeeTimes) {
+    Map<String, List<TimeRange>> optionalTimeFree = new HashMap<String, List<TimeRange>>();
+    for (String attendee: optionalAttendeeTimes.keySet()) {
+      List<TimeRange> optionalTimes = optionalAttendeeTimes.get(attendee).stream().map(Event::getWhen).collect(Collectors.toList());
+      Collections.sort(optionalTimes, TimeRange.ORDER_BY_END);
+      int end = optionalTimes.get(optionalTimes.size()-1).end();
+      Collections.sort(optionalTimes, TimeRange.ORDER_BY_START);
+      int start = optionalTimes.get(0).start();
+
+      List<TimeRange> freeTimes = findFreeTime(start, end, optionalTimes);
+      optionalTimeFree.put(attendee, freeTimes);
+    }
+    return optionalTimeFree;
+  }
+
+  /** Given a map of the frequency of time ranges, return the time range with the greatest frequency */
+  private static TimeRange getBestTime(Map<TimeRange, Integer> finalTimes) {
+    int max = 0;
+    TimeRange bestTime = TimeRange.WHOLE_DAY;
+    for (TimeRange time: finalTimes.keySet()) {
+        int frequency = finalTimes.get(time).intValue();
+        if (frequency > max) {
+          max = frequency;
+          bestTime = time;
+        }
+    }
+    return bestTime;
+  }
+
+  /** Create a map with time ranges as keys and frequency of the time range as values */
+  private static Map<TimeRange, Integer> getTimeRangeFrequency(Map<String, List<TimeRange>> optionalTimeFree, List<TimeRange> longFreeTimes) {
+    Map<TimeRange, Integer> finalTimes = new HashMap<TimeRange, Integer>();
+    for (String attendee: optionalTimeFree.keySet()) {
+      for (TimeRange optionalTime: optionalTimeFree.get(attendee)) {
+        for (TimeRange time: longFreeTimes) {
+          if (optionalTime.contains(time)) {
+            finalTimes.putIfAbsent(time, new Integer(0));
+            finalTimes.put(time, new Integer(finalTimes.get(time)+1));
+          }
+        }
+      }
+    }
+    return finalTimes;
   }
 }
