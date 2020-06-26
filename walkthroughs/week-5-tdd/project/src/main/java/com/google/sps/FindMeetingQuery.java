@@ -26,8 +26,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public final class FindMeetingQuery {
-  public Collection<TimeRange> query(Collection<Event> events, MeetingRequest request) {
-  
+  public static Collection<TimeRange> query(Collection<Event> events, MeetingRequest request) {
+
     boolean onlyOptional = false;
 
     // See if no attendees were requested or if the requested meeting is too long
@@ -77,7 +77,7 @@ public final class FindMeetingQuery {
       return Arrays.asList(TimeRange.WHOLE_DAY);
     }
 
-    // Put all the time ranges of these events into a set
+    // Put all the time ranges of these events into a list
     List<TimeRange> eventTimes = importantEvents.stream().map(Event::getWhen).collect(Collectors.toList());
 
     // Use first start time and last end time to find free time
@@ -119,7 +119,7 @@ public final class FindMeetingQuery {
       for (int j = i+1; j < eventTimes.size(); j++) {
         TimeRange range1 = eventTimes.get(i);
         TimeRange range2 = eventTimes.get(j);
-
+        
         // If the current meeting contains the next one, compare to the next next
         if (range1.contains(range2)) {
           continue;
@@ -141,7 +141,7 @@ public final class FindMeetingQuery {
   }
 
   /** Checks if optional attendees can be included in meeting time */
-  public static List<TimeRange> checkOptionalAttendees(List<TimeRange> longFreeTimes, List<TimeRange> optionalTimes) {
+  private static List<TimeRange> checkOptionalAttendees(List<TimeRange> longFreeTimes, List<TimeRange> optionalTimes) {
     List<TimeRange> optionalAttendeesIncluded = new ArrayList<TimeRange>();
     for (TimeRange time: longFreeTimes) {
       for (TimeRange optionalTime: optionalTimes) {
